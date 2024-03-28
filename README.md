@@ -12,7 +12,7 @@ First you will have to create the product review database in SQL Management Stud
 ```
 CREATE DATABASE product_review_db COLLATE LATIN1_GENERAL_100_CI_AS_SC_UTF8
 GO
-CREATE LOGIN review_login WITH PASSWORD = 'im!SDdpC3ndpcQsQ6B%S#hRx' DEFAULT_DATABASE=[product_review_db], CHECK_EXPIRATION=ON, CHECK_POLICY=ON;
+CREATE LOGIN review_login WITH PASSWORD = 'im!SDdpC3ndpcQsQ6B%S#hRx', DEFAULT_DATABASE=[product_review_db], CHECK_EXPIRATION=ON, CHECK_POLICY=ON;
 GO
 CREATE USER review_user FOR LOGIN review_login;
 GO
@@ -21,5 +21,8 @@ DENY UPDATE, DELETE ON [log] TO review_user;
 ```
 > [!TIP]
 > If you want to use your own password and username, you can modify this script, and then you <b> have to modify the application.properties file too </b> to add the new connection String to the database server!
-
-
+## application.properties
+You will have to change the <serverName> in the <i> application.properties </i> to match your SQL Server's name. If you open SSMS to join to the server you will see what the server's name is set to, usually it is the name of the PC the server is running on.
+> [!IMPORTANT]
+> You must remove the brackets (<>) from around the server name!
+ 
