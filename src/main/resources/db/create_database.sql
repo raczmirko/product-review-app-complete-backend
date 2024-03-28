@@ -1,16 +1,21 @@
+-- CREATING DATABASE --
+CREATE DATABASE product_review_db COLLATE LATIN1_GENERAL_100_CI_AS_SC_UTF8
+GO
+
 -- CREATING TABLES --
+USE product_review_db;
 
 CREATE TABLE country (
 	country_code char(3),
 	[name] varchar(100) NOT NULL,
 	CONSTRAINT pk_country_country_code PRIMARY KEY(country_code),
 	CONSTRAINT uq_country_name UNIQUE([name])
-)
+);
 
 CREATE TABLE [role] (
 	[name] varchar(100),
 	CONSTRAINT pk_role_name PRIMARY KEY([name])
-)
+);
 
 CREATE TABLE [user] (
 	id int IDENTITY(1,1),
@@ -28,7 +33,7 @@ CREATE TABLE [user] (
 		registered <= SYSDATETIME() AND
 		registered >= DATEADD(MINUTE, -1, SYSDATETIME())
 	)
-)
+);
 
 CREATE TABLE brand (
 	id int IDENTITY(1,1),
@@ -38,7 +43,7 @@ CREATE TABLE brand (
 	CONSTRAINT pk_brand_id PRIMARY KEY (id),
 	CONSTRAINT fk_brand_country FOREIGN KEY (country) REFERENCES country(country_code),
 	CONSTRAINT uq_brand_name UNIQUE ([name])
-)
+);
 
 CREATE TABLE category (
 	id int IDENTITY(1,1),
@@ -48,7 +53,7 @@ CREATE TABLE category (
 	CONSTRAINT pk_category_id PRIMARY KEY(id),
 	CONSTRAINT fk_category_category FOREIGN KEY (parent_category) REFERENCES category(id),
 	CONSTRAINT uq_category_name UNIQUE ([name])
-)
+);
 
 CREATE TABLE characteristic (
 	id int IDENTITY(1,1),
@@ -62,7 +67,7 @@ CREATE TABLE characteristic (
 	CONSTRAINT chk_characteristic_unit_and_unit_name_both_present CHECK
 		((unit_of_measure_name IS NULL AND unit_of_measure IS NULL) OR
 		 (unit_of_measure_name IS NOT NULL AND unit_of_measure IS NOT NULL))
-)
+);
 
 CREATE TABLE category_x_characteristic (
 	category int,
@@ -70,7 +75,7 @@ CREATE TABLE category_x_characteristic (
 	CONSTRAINT pk_category_x_characteristic PRIMARY KEY (category, characteristic),
 	CONSTRAINT fk_category_x_characteristic_category FOREIGN KEY (category) REFERENCES category(id),
 	CONSTRAINT fk_category_x_characteristic_characteristic FOREIGN KEY (characteristic) REFERENCES characteristic(id)
-)
+);
 
 CREATE TABLE article (
 	id int IDENTITY(1,1),
@@ -81,7 +86,7 @@ CREATE TABLE article (
 	CONSTRAINT pk_article_id PRIMARY KEY (id),
 	CONSTRAINT fk_article_brand FOREIGN KEY (brand) REFERENCES brand(id),
 	CONSTRAINT fk_article_category FOREIGN KEY (category) REFERENCES category(id)
-)
+);
 
 CREATE TABLE packaging (
 	id int IDENTITY(1,1),
@@ -95,7 +100,7 @@ CREATE TABLE packaging (
 	CONSTRAINT chk_packaging_unit_and_unit_name_both_present CHECK
 		((unit_of_measure_name IS NULL AND unit_of_measure IS NULL) OR
 		 (unit_of_measure_name IS NOT NULL AND unit_of_measure IS NOT NULL))
-)
+);
 
 CREATE TABLE product (
 	id int IDENTITY(1,1),
@@ -104,7 +109,7 @@ CREATE TABLE product (
 	CONSTRAINT pk_product PRIMARY KEY (id),
 	CONSTRAINT fk_product_article FOREIGN KEY (article) REFERENCES article(id),
 	CONSTRAINT fk_product_packaging FOREIGN KEY (packaging) REFERENCES packaging(id)
-)
+);
 
 CREATE TABLE product_characteristic_value (
 	product int,
@@ -112,7 +117,7 @@ CREATE TABLE product_characteristic_value (
 	[value] varchar(100) NOT NULL,
 	CONSTRAINT pk_product_characteristic_value PRIMARY KEY (product, characteristic),
 	CONSTRAINT fk_product_characteristic_value_article FOREIGN KEY (product) REFERENCES product(id),
-)
+);
 
 CREATE TABLE product_image (
 	id int IDENTITY(1,1),
@@ -120,7 +125,7 @@ CREATE TABLE product_image (
 	[image] varbinary(max) NOT NULL,
 	CONSTRAINT pk_product_image PRIMARY KEY (id),
 	CONSTRAINT fk_product_image_product FOREIGN KEY (product) REFERENCES product(id)
-)
+);
 
 CREATE TABLE aspect (
 	id int IDENTITY(1,1),
@@ -129,7 +134,7 @@ CREATE TABLE aspect (
 	category int NOT NULL,
 	CONSTRAINT pk_aspect PRIMARY KEY (id),
 	CONSTRAINT fk_aspect_category FOREIGN KEY (category) REFERENCES category(id)
-)
+);
 
 CREATE TABLE review_head (
 	[user] int,
@@ -149,7 +154,7 @@ CREATE TABLE review_head (
 	[date] <= SYSDATETIME() AND
 	[date] >= DATEADD(MINUTE, -1, SYSDATETIME())
 	)
-)
+);
 
 CREATE TABLE review_body (
 	[user] int,
@@ -160,7 +165,7 @@ CREATE TABLE review_body (
 	CONSTRAINT fk_review_body_review_head FOREIGN KEY ([user], product) REFERENCES review_head([user], product),
 	CONSTRAINT chk_review_body_score_between_1_and_5 CHECK (
 		score >= 1 AND score <= 5)
-)
+);
 
 CREATE TABLE [log] (
 	id int IDENTITY(1,1),
@@ -170,15 +175,319 @@ CREATE TABLE [log] (
 	[table] varchar(100) NOT NULL,
 	[description] varchar(max) NOT NULL,
 	CONSTRAINT pk_log PRIMARY KEY (id)
-)
+);
+
+GO
+-- CREATING VIEWS --
+CREATE OR ALTER VIEW v_products_recommended_by_at_least_one_user
+AS
+SELECT DISTINCT product
+FROM review_head
+WHERE recommended = 1
+AND value_for_price > 3
 
 GO
 
-USE product_review_db;
+CREATE OR ALTER VIEW v_favourite_product_of_each_user_from_each_category
+AS
+WITH user_rating_averages AS (
+		SELECT [user], category, product, AVG(CAST(rb.score AS decimal)) AS average
+		FROM review_body AS rb
+		INNER JOIN product p ON rb.product = p.id
+		INNER JOIN article a ON p.article = a.id
+		GROUP BY [user], category, product
+	),
+	user_best_ratings AS (
+		SELECT [user], category, product, average,
+			RANK() OVER (PARTITION BY [user], category ORDER BY average DESC) as ranking
+		FROM user_rating_averages
+	)
+	SELECT *
+	FROM user_best_ratings
+	WHERE ranking = 1
 
--- CREATING TRIGGERS --
+GO
 
--- Ensure category depth is maximum 3 and that there are no circular references after insert
+CREATE OR ALTER VIEW v_how_many_percent_of_users_buy_mostly_domestic_products
+AS
+WITH users_with_product AS (
+		SELECT rh.[user],b.country AS product_country,
+				rh.product, u.country AS user_country
+		FROM review_head rh
+		INNER JOIN product p ON rh.product = p.id
+		INNER JOIN article a ON p.article = a.id
+		INNER JOIN brand b ON a.brand = b.id
+		INNER JOIN [user] u ON rh.[user] = u.id
+	),
+	users_with_domestic_product AS (
+		SELECT [user], COUNT(product) AS domestic_products
+		FROM users_with_product
+		WHERE user_country = product_country
+		GROUP BY [user]
+	),
+	users_total_products AS (
+		SELECT [user], COUNT(product) AS total_products
+		FROM users_with_product
+		GROUP BY [user]
+	),
+	users_domestic_percentage AS (
+		SELECT utp.[user],
+			CASE
+				WHEN total_products = 0 THEN 0
+				ELSE
+					domestic_products / CAST(total_products AS decimal)
+			END AS 'domestic_percentage'
+		FROM users_total_products utp
+		INNER JOIN users_with_domestic_product udp ON udp.[user] = utp.[user]
+	),
+	users_domestic_above_50 AS (
+		SELECT COUNT([user]) as number_of_users
+		FROM users_domestic_percentage
+		WHERE domestic_percentage > 0.5
+	)
+	SELECT
+		CASE
+			WHEN COUNT(DISTINCT [user]) = 0 THEN 0
+			ELSE (SELECT number_of_users FROM users_domestic_above_50)
+					* 100 / CAST(COUNT(DISTINCT [user]) AS decimal)
+		 END AS 'percent'
+	FROM users_with_product
+
+GO
+
+CREATE OR ALTER VIEW v_most_popular_products_of_companies
+AS
+WITH product_rating_averages AS (
+		SELECT brand, product, AVG(CAST(rb.score AS decimal)) AS average
+		FROM review_body AS rb
+		INNER JOIN product p ON rb.product = p.id
+		INNER JOIN article a ON p.article = a.id
+		GROUP BY brand, product
+	),
+	product_best_ratings AS (
+		SELECT brand, product, average,
+			RANK() OVER (PARTITION BY brand ORDER BY average DESC) as ranking
+		FROM product_rating_averages
+	)
+	SELECT *
+	FROM product_best_ratings
+	WHERE ranking = 1
+
+GO
+
+CREATE OR ALTER VIEW v_which_packaging_is_the_most_popular_for_each_article
+AS
+WITH packaging_rating_averages AS (
+		SELECT a.id, p.packaging, AVG(CAST(rb.score AS decimal)) AS average
+		FROM review_body AS rb
+		INNER JOIN product p ON rb.product = p.id
+		INNER JOIN article a ON p.article = a.id
+		GROUP BY a.id, p.packaging
+	),
+	packaging_best_ratings AS (
+		SELECT id, packaging, average,
+			RANK() OVER (PARTITION BY id ORDER BY average DESC) as ranking
+		FROM packaging_rating_averages
+	)
+	SELECT id AS article, packaging AS most_popular_packaging
+	FROM packaging_best_ratings
+	WHERE ranking = 1
+
+GO
+
+CREATE OR ALTER VIEW v_best_rated_products_per_category
+AS
+WITH join_cte AS (
+		SELECT a.category, p.id, AVG(CAST(rb.score AS decimal) + rh.value_for_price) AS average
+		FROM review_body AS rb
+		INNER JOIN review_head rh ON rb.[user] = rh.[user]
+			AND rb.product = rh.product
+		INNER JOIN product p ON rb.product = p.id
+		INNER JOIN article a ON p.article = a.id
+		GROUP BY a.category, p.id
+	),
+	category_best_ratings AS (
+		SELECT category, id, average,
+			RANK() OVER (PARTITION BY category ORDER BY average DESC) as ranking
+		FROM join_cte
+	)
+	SELECT category, id AS most_popular_product
+	FROM category_best_ratings
+	WHERE ranking = 1
+
+GO
+
+CREATE OR ALTER VIEW v_weakness_of_most_popular_products
+AS
+WITH get_most_popular_products_ratings_cte AS (
+		SELECT v.most_popular_product, aspect, AVG(CAST(score AS decimal)) as average
+		FROM v_best_rated_products_per_category AS v
+		INNER JOIN review_body rb
+			ON v.most_popular_product = rb.product
+		GROUP BY v.most_popular_product, aspect
+	),
+	most_popular_weakest_avg AS (
+		SELECT most_popular_product, aspect, average,
+			RANK() OVER (PARTITION BY aspect ORDER BY average ASC) as ranking
+		FROM get_most_popular_products_ratings_cte
+		WHERE average < 3
+	)
+	SELECT most_popular_product AS product, aspect AS weakest_aspect
+	FROM most_popular_weakest_avg
+	WHERE ranking = 1
+
+GO
+
+CREATE OR ALTER VIEW v_user_with_most_ratings
+AS
+	WITH ratings_per_user AS (
+		SELECT [user], COUNT(*) AS rating_amount
+		FROM review_head
+		GROUP BY [user]
+	),
+	ranked_ratings AS (
+		SELECT [user], rating_amount,
+			RANK() OVER (ORDER BY rating_amount DESC) as ranking
+		FROM ratings_per_user
+	)
+	SELECT rpu.[user], u.username, rpu.rating_amount
+	FROM ranked_ratings AS rpu
+	INNER JOIN [user] AS u ON rpu.[user] = u.id
+	WHERE ranking = 1
+
+GO
+
+CREATE OR ALTER VIEW v_who_rated_multiple_products_negatively_within_one_hour
+AS
+	SELECT [user], [date], product, recommended
+	FROM review_head rh
+	WHERE recommended = 0
+		AND
+		[date] IN (SELECT [date]
+					FROM review_head rh2
+					WHERE rh2.[user] = rh.[user]
+					AND rh2.[date] <> rh.[date]
+					AND rh2.recommended = 0
+					AND rh2.[date] BETWEEN rh.[date] AND DATEADD(HOUR, 1, rh.[date])
+					OR rh2.[date] BETWEEN DATEADD(HOUR, -1, rh.[date]) AND rh.[date]
+					)
+
+GO
+
+CREATE OR ALTER VIEW v_who_had_7_day_rating_streak
+AS
+	SELECT DISTINCT [user], MIN([date]) AS streak_start
+	FROM review_head rh
+	WHERE EXISTS (SELECT 1
+					FROM review_head rh2
+					WHERE rh.[user] = rh2.[user]
+					AND CAST(rh2.[date] AS date) = CAST(DATEADD(DAY, 1, rh.[date]) AS date))
+		AND
+		EXISTS (SELECT 1
+					FROM review_head rh2
+					WHERE rh.[user] = rh2.[user]
+					AND CAST(rh2.[date] AS date) = CAST(DATEADD(DAY, 2, rh.[date]) AS date))
+		AND
+		EXISTS (SELECT 1
+					FROM review_head rh2
+					WHERE rh.[user] = rh2.[user]
+					AND CAST(rh2.[date] AS date) = CAST(DATEADD(DAY, 3, rh.[date]) AS date))
+		AND
+		EXISTS (SELECT 1
+					FROM review_head rh2
+					WHERE rh.[user] = rh2.[user]
+					AND CAST(rh2.[date] AS date) = CAST(DATEADD(DAY, 4, rh.[date]) AS date))
+		AND
+		EXISTS (SELECT 1
+					FROM review_head rh2
+					WHERE rh.[user] = rh2.[user]
+					AND CAST(rh2.[date] AS date) = CAST(DATEADD(DAY, 5, rh.[date]) AS date))
+		AND
+		EXISTS (SELECT 1
+					FROM review_head rh2
+					WHERE rh.[user] = rh2.[user]
+					AND CAST(rh2.[date] AS date) = CAST(DATEADD(DAY, 6, rh.[date]) AS date))
+		GROUP BY [user]
+
+GO
+
+CREATE OR ALTER VIEW v_which_brand_has_the_most_articles
+AS
+	WITH articles_per_brand AS (
+		SELECT brand, COUNT(id) as article_amount
+		FROM article
+		GROUP BY brand
+	)
+	SELECT brand, article_amount
+	FROM articles_per_brand
+	WHERE article_amount = (SELECT MAX(article_amount)
+							FROM articles_per_brand)
+
+GO
+
+CREATE OR ALTER VIEW v_which_brand_has_the_most_products
+AS
+	WITH products_per_brand AS (
+		SELECT brand, COUNT(p.id) as product_amount
+		FROM product AS p
+		INNER JOIN article AS a ON p.article = a.id
+		GROUP BY brand
+	)
+	SELECT brand, product_amount
+	FROM products_per_brand
+	WHERE product_amount = (SELECT MAX(product_amount)
+							FROM products_per_brand)
+
+GO
+
+CREATE OR ALTER VIEW v_top_3_best_rated_company
+AS
+	WITH brand_product_average AS (
+		SELECT brand, AVG(CAST(score AS decimal)) as rating_average
+		FROM review_body AS rb
+		INNER JOIN product AS p ON rb.product = p.id
+		INNER JOIN article AS a ON p.article = a.id
+		GROUP BY brand
+	),
+	companies_ranked AS (
+		SELECT brand, rating_average, RANK() OVER (ORDER BY rating_average DESC) as ranking
+		FROM brand_product_average
+	)
+	SELECT ranking, b.[name], CONCAT(ROUND(rating_average, 2), ' / 5.0') as rating_average
+	FROM companies_ranked
+	INNER JOIN brand AS b ON brand = b.id
+	WHERE ranking < 4
+
+GO
+
+CREATE OR ALTER VIEW v_user_reviewed_all_products_of_a_brand
+AS
+	WITH total_products_per_brand AS (
+		SELECT a.brand, COUNT(p.id) AS total_products
+		FROM product AS p
+		INNER JOIN article AS a ON p.article = a.id
+		GROUP BY a.brand
+	),
+	total_reviews_per_user_per_brand AS (
+		SELECT rb.[user], a.brand, COUNT(rb.product) AS rating_amount
+		FROM review_body AS rb
+		INNER JOIN product AS p ON rb.product = p.id
+		INNER JOIN article AS a ON p.article = a.id
+		GROUP BY rb.[user], a.brand
+	)
+	SELECT [user], brand
+	FROM total_reviews_per_user_per_brand AS main_table
+	WHERE rating_amount = (SELECT total_products
+							FROM total_products_per_brand
+							WHERE brand = main_table.brand)
+GO
+
+/*--------------------------
+   TRIGGERS AND FUNCTIONS
+*/--------------------------
+
+-- ensure category depth is maximum 3 and that
+-- there are no circular references after insert
 CREATE OR ALTER TRIGGER trg_check_category_depth_and_circular_reference
 ON category
 AFTER INSERT, UPDATE
@@ -807,268 +1116,11 @@ END;
 
 GO
 
--- CREATING VIEWS --
-
-CREATE OR ALTER VIEW v_top_3_best_rated_company AS
-	WITH brand_product_average AS (
-		SELECT brand, AVG(CAST(score AS decimal)) as rating_average
-		FROM review_body AS rb
-		INNER JOIN product AS p ON rb.product = p.id
-		INNER JOIN article AS a ON p.article = a.id
-		GROUP BY brand
-	),
-	companies_ranked AS (
-		SELECT brand, rating_average, RANK() OVER (ORDER BY rating_average DESC) as ranking
-		FROM brand_product_average
-	)
-	SELECT ranking, b.[name], CONCAT(ROUND(rating_average, 2), ' / 5.0') as rating_average
-	FROM companies_ranked
-	INNER JOIN brand AS b ON brand = b.id
-	WHERE ranking < 4
-
+-- CREATING USERS --
+CREATE LOGIN review_login WITH PASSWORD = 'im!SDdpC3ndpcQsQ6B%S#hRx', DEFAULT_DATABASE=[product_review_db], CHECK_EXPIRATION=ON, CHECK_POLICY=ON;
 GO
-
-CREATE OR ALTER VIEW v_which_brand_has_the_most_products AS
-	WITH products_per_brand AS (
-		SELECT brand, COUNT(p.id) as product_amount
-		FROM product AS p
-		INNER JOIN article AS a ON p.article = a.id
-		GROUP BY brand
-	)
-	SELECT brand, product_amount
-	FROM products_per_brand
-	WHERE product_amount = (SELECT MAX(product_amount)
-							FROM products_per_brand)
+CREATE USER review_user FOR LOGIN review_login;
 GO
-
-CREATE OR ALTER VIEW v_which_brand_has_the_most_articles AS
-	WITH articles_per_brand AS (
-		SELECT brand, COUNT(id) as article_amount
-		FROM article
-		GROUP BY brand
-	)
-	SELECT brand, article_amount
-	FROM articles_per_brand
-	WHERE article_amount = (SELECT MAX(article_amount)
-							FROM articles_per_brand)
+ALTER ROLE db_owner ADD MEMBER review_user;
 GO
-
-CREATE OR ALTER VIEW v_who_had_7_day_rating_streak AS
-	SELECT DISTINCT [user], MIN([date]) AS streak_start
-	FROM review_head rh
-	WHERE EXISTS (SELECT 1
-					FROM review_head rh2
-					WHERE rh.[user] = rh2.[user]
-					AND CAST(rh2.[date] AS date) = CAST(DATEADD(DAY, 1, rh.[date]) AS date))
-    AND
-    EXISTS (SELECT 1
-                FROM review_head rh2
-                WHERE rh.[user] = rh2.[user]
-                AND CAST(rh2.[date] AS date) = CAST(DATEADD(DAY, 2, rh.[date]) AS date))
-    AND
-    EXISTS (SELECT 1
-                FROM review_head rh2
-                WHERE rh.[user] = rh2.[user]
-                AND CAST(rh2.[date] AS date) = CAST(DATEADD(DAY, 3, rh.[date]) AS date))
-    AND
-    EXISTS (SELECT 1
-                FROM review_head rh2
-                WHERE rh.[user] = rh2.[user]
-                AND CAST(rh2.[date] AS date) = CAST(DATEADD(DAY, 4, rh.[date]) AS date))
-    AND
-    EXISTS (SELECT 1
-                FROM review_head rh2
-                WHERE rh.[user] = rh2.[user]
-                AND CAST(rh2.[date] AS date) = CAST(DATEADD(DAY, 5, rh.[date]) AS date))
-    AND
-    EXISTS (SELECT 1
-                FROM review_head rh2
-                WHERE rh.[user] = rh2.[user]
-                AND CAST(rh2.[date] AS date) = CAST(DATEADD(DAY, 6, rh.[date]) AS date))
-    GROUP BY [user]
-GO
-
-CREATE OR ALTER VIEW v_who_rated_multiple_products_negatively_within_one_hour
-AS
-	SELECT [user], [date], product, recommended
-	FROM review_head rh
-	WHERE recommended = 0
-		AND
-		[date] IN (SELECT [date]
-                    FROM review_head rh2
-                    WHERE rh2.[user] = rh.[user]
-                    AND rh2.[date] <> rh.[date]
-                    AND rh2.recommended = 0
-                    AND rh2.[date] BETWEEN rh.[date] AND DATEADD(HOUR, 1, rh.[date])
-                    OR rh2.[date] BETWEEN DATEADD(HOUR, -1, rh.[date]) AND rh.[date]
-                    )
-GO
-
-CREATE OR ALTER VIEW v_user_with_most_ratings
-AS
-	WITH ratings_per_user AS (
-		SELECT [user], COUNT(*) AS rating_amount
-		FROM review_head
-		GROUP BY [user]
-	),
-	ranked_ratings AS (
-		SELECT [user], rating_amount,
-			RANK() OVER (ORDER BY rating_amount DESC) as ranking
-		FROM ratings_per_user
-	)
-	SELECT rpu.[user], u.username, rpu.rating_amount
-	FROM ranked_ratings AS rpu
-	INNER JOIN [user] AS u ON rpu.[user] = u.id
-	WHERE ranking = 1
-GO
-
-CREATE OR ALTER VIEW v_weakness_of_most_popular_products
-AS
-WITH get_most_popular_products_ratings_cte AS (
-		SELECT v.most_popular_product, aspect, AVG(CAST(score AS decimal)) as average
-		FROM v_which_packaging_is_the_most_popular_for_each_article AS v
-		INNER JOIN review_body rb
-			ON v.most_popular_product = rb.product
-		GROUP BY most_popular_product, aspect
-	),
-	most_popular_weakest_avg AS (
-		SELECT most_popular_product, aspect, average,
-			RANK() OVER (PARTITION BY aspect ORDER BY average ASC) as ranking
-		FROM get_most_popular_products_ratings_cte
-		WHERE average < 3
-	)
-	SELECT most_popular_product AS product, aspect AS weakest_aspect
-	FROM most_popular_weakest_avg
-	WHERE ranking = 1
-GO
-
-CREATE OR ALTER VIEW v_which_packaging_is_the_most_popular_for_each_article
-AS
-WITH join_cte AS (
-		SELECT a.category, p.id, AVG(CAST(rb.score AS decimal) + rh.value_for_price) AS average
-		FROM review_body AS rb
-		INNER JOIN review_head rh ON rb.[user] = rh.[user]
-			AND rb.product = rh.product
-		INNER JOIN product p ON rb.product = p.id
-		INNER JOIN article a ON p.article = a.id
-		GROUP BY a.category, p.id
-	),
-	category_best_ratings AS (
-		SELECT category, id, average,
-			RANK() OVER (PARTITION BY category ORDER BY average DESC) as ranking
-		FROM join_cte
-	)
-	SELECT category, id AS most_popular_product
-	FROM category_best_ratings
-	WHERE ranking = 1
-GO
-
-CREATE OR ALTER VIEW v_which_packaging_is_the_most_popular_for_each_article
-AS
-WITH packaging_rating_averages AS (
-		SELECT a.id, p.packaging, AVG(CAST(rb.score AS decimal)) AS average
-		FROM review_body AS rb
-		INNER JOIN product p ON rb.product = p.id
-		INNER JOIN article a ON p.article = a.id
-		GROUP BY a.id, p.packaging
-	),
-	packaging_best_ratings AS (
-		SELECT id, packaging, average,
-			RANK() OVER (PARTITION BY id ORDER BY average DESC) as ranking
-		FROM packaging_rating_averages
-	)
-	SELECT id AS article, packaging AS most_popular_packaging
-	FROM packaging_best_ratings
-	WHERE ranking = 1
-GO
-
-CREATE OR ALTER VIEW v_most_popular_products_of_companies
-AS
-WITH product_rating_averages AS (
-		SELECT brand, product, AVG(CAST(rb.score AS decimal)) AS average
-		FROM review_body AS rb
-		INNER JOIN product p ON rb.product = p.id
-		INNER JOIN article a ON p.article = a.id
-		GROUP BY brand, product
-	),
-	product_best_ratings AS (
-		SELECT brand, product, average,
-			RANK() OVER (PARTITION BY brand ORDER BY average DESC) as ranking
-		FROM product_rating_averages
-	)
-	SELECT *
-	FROM product_best_ratings
-	WHERE ranking = 1
-GO
-
-CREATE OR ALTER VIEW v_how_many_percent_of_users_buy_mostly_domestic_products
-AS
-WITH users_with_product AS (
-		SELECT rh.[user],b.country AS product_country,
-				rh.product, u.country AS user_country
-		FROM review_head rh
-		INNER JOIN product p ON rh.product = p.id
-		INNER JOIN article a ON p.article = a.id
-		INNER JOIN brand b ON a.brand = b.id
-		INNER JOIN [user] u ON rh.[user] = u.id
-	),
-	users_with_domestic_product AS (
-		SELECT [user], COUNT(product) AS domestic_products
-		FROM users_with_product
-		WHERE user_country = product_country
-		GROUP BY [user]
-	),
-	users_total_products AS (
-		SELECT [user], COUNT(product) AS total_products
-		FROM users_with_product
-		GROUP BY [user]
-	),
-	users_domestic_percentage AS (
-		SELECT utp.[user],
-			CASE
-				WHEN total_products = 0 THEN 0
-				ELSE
-					domestic_products / CAST(total_products AS decimal)
-			END AS 'domestic_percentage'
-		FROM users_total_products utp
-		INNER JOIN users_with_domestic_product udp ON udp.[user] = utp.[user]
-	),
-	users_domestic_above_50 AS (
-		SELECT COUNT([user]) as number_of_users
-		FROM users_domestic_percentage
-		WHERE domestic_percentage > 0.5
-	)
-	SELECT
-		CASE
-			WHEN COUNT(DISTINCT [user]) = 0 THEN 0
-			ELSE (SELECT number_of_users FROM users_domestic_above_50)
-					* 100 / CAST(COUNT(DISTINCT [user]) AS decimal)
-		 END AS 'percent'
-	FROM users_with_product
-GO
-
-CREATE OR ALTER VIEW v_favourite_product_of_each_user_from_each_category
-AS
-WITH user_rating_averages AS (
-		SELECT [user], category, product, AVG(CAST(rb.score AS decimal)) AS average
-		FROM review_body AS rb
-		INNER JOIN product p ON rb.product = p.id
-		INNER JOIN article a ON p.article = a.id
-		GROUP BY [user], category, product
-	),
-	user_best_ratings AS (
-		SELECT [user], category, product, average,
-			RANK() OVER (PARTITION BY [user], category ORDER BY average DESC) as ranking
-		FROM user_rating_averages
-	)
-	SELECT *
-	FROM user_best_ratings
-	WHERE ranking = 1
-GO
-
-CREATE OR ALTER VIEW v_products_recommended_by_at_least_one_user
-AS
-SELECT DISTINCT product
-FROM review_head
-WHERE recommended = 1
-AND value_for_price > 3
+DENY UPDATE, DELETE ON [log] TO review_user;
