@@ -24,7 +24,7 @@ CREATE TABLE [user] (
 	country char(3) NOT NULL,
 	registered datetime2 NOT NULL CONSTRAINT df_user_registered DEFAULT SYSDATETIME(),
 	[role] varchar(100) NOT NULL,
-	active bit NOT NULL,
+	is_active bit NOT NULL,
 	CONSTRAINT pk_user_id PRIMARY KEY (id),
 	CONSTRAINT fk_user_country FOREIGN KEY (country) REFERENCES country(country_code),
 	CONSTRAINT fk_user_role FOREIGN KEY ([role]) REFERENCES [role]([name]),
