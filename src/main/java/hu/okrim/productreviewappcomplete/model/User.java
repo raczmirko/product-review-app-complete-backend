@@ -11,6 +11,8 @@ public class User {
     private Long id;
     @Column(nullable = false, unique = true, length = 100)
     private String userName;
+    @Column(nullable = false, length = 1000)
+    private String password;
     @ManyToOne
     @JoinColumn(name = "country", nullable = false)
     private Country country;
@@ -27,8 +29,9 @@ public class User {
         this.isActive = true;
     }
 
-    public User(String userName, Country country, Role role) {
+    public User(String userName, String password, Country country, Role role) {
         this.userName = userName;
+        this.password = password;
         this.country = country;
         this.role = role;
         this.registrationDate = Instant.now();
@@ -51,6 +54,14 @@ public class User {
         this.userName = userName;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public Country getCountry() {
         return country;
     }
@@ -67,11 +78,15 @@ public class User {
         this.role = role;
     }
 
-    public Boolean getIsActive() {
+    public void setRegistrationDate(Instant registrationDate) {
+        this.registrationDate = registrationDate;
+    }
+
+    public Boolean getActive() {
         return isActive;
     }
 
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
+    public void setActive(Boolean active) {
+        isActive = active;
     }
 }
