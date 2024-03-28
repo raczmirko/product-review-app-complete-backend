@@ -17,7 +17,6 @@ GO
 CREATE USER review_user FOR LOGIN review_login;
 GO
 ALTER ROLE db_owner ADD MEMBER review_user;
-DENY UPDATE, DELETE ON [log] TO review_user;
 ```
 > [!TIP]
 > If you want to use your own password and username, you can modify this script, and then you <b> have to modify the application.properties file too </b> to add the new connection String to the database server!
