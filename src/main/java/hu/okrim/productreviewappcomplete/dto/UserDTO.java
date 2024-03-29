@@ -1,5 +1,6 @@
 package hu.okrim.productreviewappcomplete.dto;
 
+import hu.okrim.productreviewappcomplete.model.Country;
 import hu.okrim.productreviewappcomplete.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,8 +16,8 @@ public class UserDTO {
     private Long id;
     private String username;
     private String password;
-    private CountryDTO country;
+    private Country country;
     private Instant registrationDate;
-    private RoleDTO role;
+    private Role role;
     private Boolean isActive;
 }
