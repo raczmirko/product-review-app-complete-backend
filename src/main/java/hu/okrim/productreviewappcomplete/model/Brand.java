@@ -1,7 +1,15 @@
 package hu.okrim.productreviewappcomplete.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "brand")
 public class Brand {
@@ -15,41 +23,4 @@ public class Brand {
     private Country countryOfOrigin;
     @Column(length = 1000)
     private String description;
-
-    public Brand() {
-    }
-
-    public Brand(String name, Country countryOfOrigin, String description) {
-        this.name = name;
-        this.countryOfOrigin = countryOfOrigin;
-        this.description = description;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Country getCountryOfOrigin() {
-        return countryOfOrigin;
-    }
-
-    public void setCountryOfOrigin(Country countryOfOrigin) {
-        this.countryOfOrigin = countryOfOrigin;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

@@ -1,7 +1,15 @@
 package hu.okrim.productreviewappcomplete.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "product")
 public class Product {
@@ -14,32 +22,4 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "packaging", nullable = false)
     private Packaging packaging;
-
-    public Product() {
-    }
-
-    public Product(Article article, Packaging packaging) {
-        this.article = article;
-        this.packaging = packaging;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Article getArticle() {
-        return article;
-    }
-
-    public void setArticle(Article article) {
-        this.article = article;
-    }
-
-    public Packaging getPackaging() {
-        return packaging;
-    }
-
-    public void setPackaging(Packaging packaging) {
-        this.packaging = packaging;
-    }
 }

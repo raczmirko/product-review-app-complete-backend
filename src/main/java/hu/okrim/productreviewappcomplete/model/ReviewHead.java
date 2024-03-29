@@ -3,9 +3,16 @@ package hu.okrim.productreviewappcomplete.model;
 import hu.okrim.productreviewappcomplete.model.compositeKey.ProductCharacteristicValueId;
 import hu.okrim.productreviewappcomplete.model.compositeKey.ReviewHeadId;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.Instant;
-
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "review_head")
 public class ReviewHead {

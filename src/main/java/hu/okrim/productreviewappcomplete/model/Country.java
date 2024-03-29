@@ -14,6 +14,9 @@ public class Country {
     @Column(nullable = false, unique = true, length = 100)
     private String name;
 
+    public Country() {
+    }
+
     public Country(String countryCode, String name) {
         this.countryCode = countryCode;
         this.name = name;
