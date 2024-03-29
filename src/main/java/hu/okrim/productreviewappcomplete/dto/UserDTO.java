@@ -2,6 +2,7 @@ package hu.okrim.productreviewappcomplete.dto;
 
 import hu.okrim.productreviewappcomplete.model.Country;
 import hu.okrim.productreviewappcomplete.model.Role;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +17,9 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 public class UserDTO {
     private Long id;
+    @NotBlank(message =  "Username cannot be blank.")
     private String username;
+    @NotBlank(message =  "Password cannot be blank.")
     private String password;
     private Country country;
     private ZonedDateTime registrationDate;
