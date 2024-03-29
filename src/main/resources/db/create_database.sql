@@ -1128,6 +1128,12 @@ DENY UPDATE, DELETE ON [log] TO review_user;
 GO
 
 -- INSERTING countries --
+INSERT INTO role ([name]) VALUES
+('admin'),
+('user')
+
+GO
+
 INSERT INTO country (country_code, [name]) VALUES
 ('AFG', 'Afghanistan'),
 ('ALB', 'Albania'),
