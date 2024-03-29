@@ -7,11 +7,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.time.ZonedDateTime;
+
 @Setter
 @Getter
 @AllArgsConstructor
 @Entity
-@Table(name = "user")
+@Table(name = "\"user\"")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,16 +27,14 @@ public class User {
     @JoinColumn(name = "country", nullable = false)
     private Country country;
     @Column(name = "registered", nullable = false)
-    @JsonIgnore
-    private Instant registrationDate;
+    private ZonedDateTime registrationDate;
     @ManyToOne
     @JoinColumn(name = "role", nullable = false)
     private Role role;
-    @Column(nullable = false)
+    @Column(name = "active", nullable = false)
     private Boolean isActive;
 
     public User() {
-        this.registrationDate = Instant.now();
         this.isActive = true;
     }
 }

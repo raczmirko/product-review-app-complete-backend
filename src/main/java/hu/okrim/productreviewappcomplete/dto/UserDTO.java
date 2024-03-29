@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.time.ZonedDateTime;
+
 @Setter
 @Getter
 @NoArgsConstructor
@@ -17,7 +19,7 @@ public class UserDTO {
     private String username;
     private String password;
     private Country country;
-    private Instant registrationDate;
+    private ZonedDateTime registrationDate;
     private Role role;
     private Boolean isActive;
 }
