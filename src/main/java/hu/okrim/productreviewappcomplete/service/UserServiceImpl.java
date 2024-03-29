@@ -1,7 +1,5 @@
 package hu.okrim.productreviewappcomplete.service;
 
-import hu.okrim.productreviewappcomplete.dto.UserDTO;
-import hu.okrim.productreviewappcomplete.mapper.UserMapper;
 import hu.okrim.productreviewappcomplete.model.User;
 import hu.okrim.productreviewappcomplete.repository.UserRepository;
 import hu.okrim.productreviewappcomplete.exception.EntityNotFoundException;
