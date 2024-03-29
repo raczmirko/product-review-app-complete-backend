@@ -1,5 +1,7 @@
 package hu.okrim.productreviewappcomplete.service;
 
+import hu.okrim.productreviewappcomplete.dto.UserDTO;
+import hu.okrim.productreviewappcomplete.mapper.UserMapper;
 import hu.okrim.productreviewappcomplete.model.User;
 import hu.okrim.productreviewappcomplete.repository.UserRepository;
 import hu.okrim.productreviewappcomplete.exception.EntityNotFoundException;
@@ -17,21 +19,21 @@ public class UserServiceImpl implements UserService{
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
     @Override
-    public User getUser(Long id) {
+    public UserDTO getUser(Long id) {
         Optional<User> user = userRepository.findById(id);
-        return unwrapUser(user, id);
+        return UserMapper.mapToUserDTO(unwrapUser(user, id));
     }
 
     @Override
-    public User getUser(String username) {
-        Optional<User> user = userRepository.findByUserName(username);
-        return unwrapUser(user, 404L);
+    public UserDTO getUser(String username) {
+        Optional<User> user = userRepository.findByUsername(username);
+        return UserMapper.mapToUserDTO(unwrapUser(user, 404L));
     }
 
     @Override
-    public User saveUser(User user) {
+    public void saveUser(UserDTO user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        userRepository.save(UserMapper.mapToUser(user));
     }
 
     @Override
