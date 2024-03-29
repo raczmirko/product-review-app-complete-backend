@@ -6,9 +6,9 @@ import hu.okrim.productreviewappcomplete.model.User;
 import java.util.List;
 
 public interface UserService {
-    UserDTO getUser(Long id);
-    UserDTO getUser(String username);
-    void saveUser(UserDTO user);
+    User getUser(Long id);
+    User getUser(String username);
+    void saveUser(User user);
     void deleteUser(Long id);
     List<User> getUsers();
 }
