@@ -23,11 +23,8 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<HttpStatus> createUser(@RequestBody User user) {
-        System.out.println("Received user:" + user);
-        System.out.println("Username: " + user.getUsername());
-        System.out.println("Country: " + user.getCountry());
-        userService.saveUser(UserMapper.mapToUserDTO(user));
+    public ResponseEntity<HttpStatus> createUser(@RequestBody UserDTO user) {
+        userService.saveUser(UserMapper.mapToUser(user));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }
