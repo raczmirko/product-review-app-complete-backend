@@ -19,4 +19,8 @@ public class Role {
     @Id
     @Column(length = 100)
     private String name;
+
+    public Role (RoleType roleType) {
+        this.setName(roleType.name());
+    }
 }
