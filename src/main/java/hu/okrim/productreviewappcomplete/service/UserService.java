@@ -11,4 +11,5 @@ public interface UserService {
     void saveUser(User user);
     void deleteUser(Long id);
     List<User> getUsers();
+    String getUserRole(String username);
 }

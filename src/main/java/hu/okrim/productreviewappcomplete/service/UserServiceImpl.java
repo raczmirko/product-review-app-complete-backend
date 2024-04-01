@@ -44,6 +44,12 @@ public class UserServiceImpl implements UserService{
         return userRepository.findAll();
     }
 
+    @Override
+    public String getUserRole(String username) {
+        Optional<User> user = userRepository.findByUsername(username);
+        return user.isPresent() ? user.get().getRole().getName() : "error";
+    }
+
     static User unwrapUser(Optional<User> entity, Long id) {
         if (entity.isPresent()) return entity.get();
         else throw new EntityNotFoundException(id, User.class);
