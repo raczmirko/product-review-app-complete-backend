@@ -27,6 +27,7 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers(HttpMethod.POST, SecurityConstants.REGISTER_PATH).permitAll()
+                    .requestMatchers(HttpMethod.GET, "/country/all").permitAll()
                     .anyRequest().authenticated()
             )
             .addFilterBefore(new ExceptionHandlerFilter(), AuthenticationFilter.class)
