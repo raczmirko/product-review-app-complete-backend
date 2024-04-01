@@ -5,6 +5,7 @@ import hu.okrim.productreviewappcomplete.mapper.UserMapper;
 import hu.okrim.productreviewappcomplete.model.Country;
 import hu.okrim.productreviewappcomplete.model.Role;
 import hu.okrim.productreviewappcomplete.model.RoleType;
+import hu.okrim.productreviewappcomplete.service.CountryService;
 import hu.okrim.productreviewappcomplete.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ import java.time.ZonedDateTime;
 public class UserController {
     @Autowired
     UserService userService;
+    @Autowired
+    CountryService countryService;
 
     @GetMapping("/{id}")
     public ResponseEntity<String> findById(@PathVariable Long id) {
@@ -30,7 +33,6 @@ public class UserController {
         user.setIsActive(true);
         user.setRole(new Role(RoleType.USER));
         user.setRegistrationDate(ZonedDateTime.now());
-        user.setCountry(new Country("HUN", "Hungary"));
         userService.saveUser(UserMapper.mapToUser(user));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
