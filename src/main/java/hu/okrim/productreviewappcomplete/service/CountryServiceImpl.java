@@ -6,6 +6,10 @@ import hu.okrim.productreviewappcomplete.repository.CountryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @Service
 public class CountryServiceImpl implements CountryService{
     @Autowired
@@ -23,5 +27,13 @@ public class CountryServiceImpl implements CountryService{
     @Override
     public void deleteCountryByCountryCode(String countryCode) {
 
+    }
+
+    @Override
+    public List<Country> getCountries() {
+        List<Country> countries = new ArrayList<>();
+        Iterable<Country> iterator = countryRepository.findAll();
+        iterator.forEach(countries::add);
+        return countries;
     }
 }
