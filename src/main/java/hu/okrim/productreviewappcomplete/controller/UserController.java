@@ -34,13 +34,4 @@ public class UserController {
         userService.saveUser(UserMapper.mapToUser(user));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-
-    @GetMapping("/login")
-    public ResponseEntity<HttpStatus> loginUser(@Valid @RequestBody UserDTO user) {
-        user.setIsActive(true);
-        user.setRegistrationDate(ZonedDateTime.now());
-        user.setCountry(new Country("HUN", "Hungary"));
-        userService.saveUser(UserMapper.mapToUser(user));
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
 }
