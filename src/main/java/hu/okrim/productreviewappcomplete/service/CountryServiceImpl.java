@@ -31,9 +31,7 @@ public class CountryServiceImpl implements CountryService{
 
     @Override
     public List<Country> getCountries() {
-        List<Country> countries = new ArrayList<>();
-        Iterable<Country> iterator = countryRepository.findAll();
-        iterator.forEach(countries::add);
+        List<Country> countries = countryRepository.findByOrderByNameAsc();
         return countries;
     }
 }
