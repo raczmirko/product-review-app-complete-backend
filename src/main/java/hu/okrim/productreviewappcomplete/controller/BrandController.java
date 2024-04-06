@@ -1,5 +1,7 @@
 package hu.okrim.productreviewappcomplete.controller;
 
+import hu.okrim.productreviewappcomplete.dto.BrandDTO;
+import hu.okrim.productreviewappcomplete.mapper.BrandMapper;
 import hu.okrim.productreviewappcomplete.model.Brand;
 import hu.okrim.productreviewappcomplete.service.BrandService;
 import hu.okrim.productreviewappcomplete.specification.BrandSpecificationBuilder;
@@ -9,12 +11,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.http.HttpResponse;
 import java.util.List;
 
 @RestController
@@ -22,6 +22,8 @@ import java.util.List;
 public class BrandController {
     @Autowired
     BrandService brandService;
+    @Autowired
+
     @GetMapping("/all")
     public ResponseEntity<List<Brand>> getBrands() {
         return new ResponseEntity<>(brandService.getBrands(), HttpStatus.OK);
@@ -29,6 +31,12 @@ public class BrandController {
     @PostMapping("/{id}/delete")
     public ResponseEntity<HttpStatus> deleteBrand(@PathVariable("id") Long id){
         brandService.deleteBrandById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<HttpStatus> createBrand(@RequestBody BrandDTO brandDTO){
+        brandService.saveBrand(BrandMapper.mapToBrand(brandDTO));
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -27,7 +27,7 @@ public class BrandServiceImpl implements BrandService{
 
     @Override
     public void saveBrand(Brand brand) {
-
+        brandRepository.save(brand);
     }
 
     @Override
