@@ -4,7 +4,13 @@ import hu.okrim.productreviewappcomplete.dto.CountryDTO;
 import hu.okrim.productreviewappcomplete.mapper.CountryMapper;
 import hu.okrim.productreviewappcomplete.model.Country;
 import hu.okrim.productreviewappcomplete.service.CountryService;
+import hu.okrim.productreviewappcomplete.specification.CountrySpecificationBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +32,39 @@ public class CountryController {
         return new ResponseEntity<>(countryService.getCountries(), HttpStatus.OK);
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<HttpStatus> saveCountry(@RequestBody CountryDTO countryDTO) {
+    @PostMapping("/create")
+    public ResponseEntity<HttpStatus> createCountry(@RequestBody CountryDTO countryDTO) {
         countryService.saveCountry(CountryMapper.mapToCountry(countryDTO));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
+    @PostMapping("/{id}/delete")
+    public ResponseEntity<HttpStatus> deleteCountry(@PathVariable("countryCode") String countryCode){
+        countryService.deleteCountryByCountryCode(countryCode);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<Country>> searchCountries(@RequestParam(value = "searchText", required = false) String searchText,
+                                                    @RequestParam(value = "searchColumn", required = false) String searchColumn,
+                                                    @RequestParam("pageSize") Integer pageSize,
+                                                    @RequestParam("pageNumber") Integer pageNumber,
+                                                    @RequestParam("orderByColumn") String orderByColumn,
+                                                    @RequestParam("orderByDirection") String orderByDirection) {
+        CountrySpecificationBuilder<Country> countryCountrySpecificationBuilder = new CountrySpecificationBuilder<>();
+        if (searchColumn != null) {
+            switch (searchColumn) {
+                case "name" -> countryCountrySpecificationBuilder.withName(searchText);
+                case "countryCode" -> countryCountrySpecificationBuilder.withCountryCode(searchText);
+                default -> {
+                }
+                // Handle unknown search columns
+            }
+        }
+        Specification<Country> specification = countryCountrySpecificationBuilder.build();
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(orderByDirection.equals("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC, orderByColumn));
+        Page<Country> countriesPage = countryService.findAllBySpecification(specification, pageable);
+        return ResponseEntity.ok(countriesPage);
+    }
+
 }
