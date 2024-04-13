@@ -15,6 +15,17 @@ public class BrandSpecificationBuilder<Brand> {
         this.specifications = new ArrayList<>();
     }
 
+    public BrandSpecificationBuilder<Brand> withId(String id) {
+        try {
+            int numericId = Integer.parseInt(id);
+            specifications.add((root, query, builder) -> builder.equal(root.get("id"), numericId));
+            return this;
+        }
+        catch (NumberFormatException e) {
+            return this;
+        }
+    }
+
     public BrandSpecificationBuilder<Brand> withName(String name) {
         if (name != null && !name.isEmpty()) {
             specifications.add((root, query, builder) -> builder.like(root.get("name"), "%" + name + "%"));

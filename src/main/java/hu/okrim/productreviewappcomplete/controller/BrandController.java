@@ -52,6 +52,7 @@ public class BrandController {
         BrandSpecificationBuilder<Brand> brandBrandSpecificationBuilder = new BrandSpecificationBuilder<>();
         if (searchColumn != null) {
             switch (searchColumn) {
+                case "id" -> brandBrandSpecificationBuilder.withId(searchText);
                 case "name" -> brandBrandSpecificationBuilder.withName(searchText);
                 case "description" -> brandBrandSpecificationBuilder.withDescription(searchText);
                 case "countryOfOrigin" -> brandBrandSpecificationBuilder.withCountry(searchText);
