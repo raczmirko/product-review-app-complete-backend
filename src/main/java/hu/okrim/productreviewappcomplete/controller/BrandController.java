@@ -43,10 +43,12 @@ public class BrandController {
     @GetMapping("/search")
     public ResponseEntity<Page<Brand>> searchBrands(@RequestParam(value = "searchText", required = false) String searchText,
                                                     @RequestParam(value = "searchColumn", required = false) String searchColumn,
+                                                    @RequestParam(value = "quickFilterValues", required = false) String quickFilterValues,
                                                     @RequestParam("pageSize") Integer pageSize,
                                                     @RequestParam("pageNumber") Integer pageNumber,
                                                     @RequestParam("orderByColumn") String orderByColumn,
-                                                    @RequestParam("orderByDirection") String orderByDirection) {
+                                                    @RequestParam("orderByDirection") String orderByDirection
+                                                    ) {
         BrandSpecificationBuilder<Brand> brandBrandSpecificationBuilder = new BrandSpecificationBuilder<>();
         if (searchColumn != null) {
             switch (searchColumn) {
@@ -54,8 +56,14 @@ public class BrandController {
                 case "description" -> brandBrandSpecificationBuilder.withDescription(searchText);
                 case "countryOfOrigin" -> brandBrandSpecificationBuilder.withCountry(searchText);
                 default -> {
+
                 }
-                // Handle unknown search columns
+            }
+        }
+        else {
+            if(quickFilterValues != null && !quickFilterValues.isEmpty()){
+                // When searchColumn is not provided all fields are searched
+                brandBrandSpecificationBuilder.withQuickFilterValues(List.of(quickFilterValues.split(",")));
             }
         }
         Specification<Brand> specification = brandBrandSpecificationBuilder.build();

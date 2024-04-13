@@ -39,6 +39,35 @@ public class BrandSpecificationBuilder<Brand> {
         return this;
     }
 
+    // Add OR criteria for quickFilterValues
+    public BrandSpecificationBuilder<Brand> withQuickFilterValues(List<String> quickFilterValues) {
+        if (quickFilterValues != null && !quickFilterValues.isEmpty()) {
+            List<Specification<Brand>> orSpecifications = new ArrayList<>();
+            for (String value : quickFilterValues) {
+                try {
+                    int intValue = Integer.parseInt(value);
+                    orSpecifications.add((root, query, builder) ->
+                            builder.or(
+                                    builder.equal(root.get("id"), intValue)
+                            )
+                    );
+                } catch (NumberFormatException e) {
+                    // The case where the value cannot be converted to an integer
+                    // For example searching for 'OK', thus ID cannot be equal with 'OK'
+                    // Nothing to be done, ID filter is simply ignored
+                }
+                orSpecifications.add((root, query, builder) ->
+                    builder.or(
+                        builder.like(root.get("name"), "%" + value + "%"),
+                        builder.like(root.get("description"), "%" + value + "%"),
+                        builder.like(root.join("countryOfOrigin").get("name"), "%" + value + "%")
+                    ));
+            }
+            specifications.add(Specification.where(orSpecifications.stream().reduce((a, b) -> a.or(b)).orElse(null)));
+        }
+        return this;
+    }
+
     public Specification<Brand> build() {
         if (specifications.isEmpty()) {
             return null; // No criteria specified
