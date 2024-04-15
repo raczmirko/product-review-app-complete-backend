@@ -34,6 +34,30 @@ public class BrandController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("multi-delete/{ids}")
+    public ResponseEntity<HttpStatus> deleteBrands(@PathVariable("ids") Long[] ids){
+        for(Long id : ids) {
+            brandService.deleteBrandById(id);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}/modify")
+    public ResponseEntity<HttpStatus> modifyBrand(@PathVariable("id") Long id, @RequestBody BrandDTO brandDTO){
+        Brand existingBrand = brandService.findBrandById(id);
+
+        if (existingBrand == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        existingBrand.setName(brandDTO.getName());
+        existingBrand.setDescription(brandDTO.getDescription());
+
+        brandService.saveBrand(existingBrand);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PostMapping("/create")
     public ResponseEntity<HttpStatus> createBrand(@RequestBody BrandDTO brandDTO){
         brandService.saveBrand(BrandMapper.mapToBrand(brandDTO));
