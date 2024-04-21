@@ -52,6 +52,7 @@ public class BrandController {
 
         existingBrand.setName(brandDTO.getName());
         existingBrand.setDescription(brandDTO.getDescription());
+        existingBrand.setCountryOfOrigin(brandDTO.getCountryOfOrigin());
 
         brandService.saveBrand(existingBrand);
 
