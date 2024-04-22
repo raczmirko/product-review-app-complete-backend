@@ -1,7 +1,9 @@
 package hu.okrim.productreviewappcomplete.controller;
 
+import hu.okrim.productreviewappcomplete.dto.BrandDTO;
 import hu.okrim.productreviewappcomplete.dto.CountryDTO;
 import hu.okrim.productreviewappcomplete.mapper.CountryMapper;
+import hu.okrim.productreviewappcomplete.model.Brand;
 import hu.okrim.productreviewappcomplete.model.Country;
 import hu.okrim.productreviewappcomplete.service.CountryService;
 import hu.okrim.productreviewappcomplete.specification.CountrySpecificationBuilder;
@@ -41,6 +43,27 @@ public class CountryController {
     @PostMapping("/{id}/delete")
     public ResponseEntity<HttpStatus> deleteCountry(@PathVariable("countryCode") String countryCode){
         countryService.deleteCountryByCountryCode(countryCode);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/multi-delete/{countryCodes}")
+    public ResponseEntity<HttpStatus> deleteCountries(@PathVariable("countryCodes") String[] countryCodes){
+        for(String countryCode : countryCodes) {
+            countryService.deleteCountryByCountryCode(countryCode);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}/modify")
+    public ResponseEntity<HttpStatus> modifyCountry(@PathVariable("countryCode") String countryCode, @RequestBody CountryDTO countryDTO){
+        Country existingCountry = countryService.getCountryByCountryCode(countryDTO.getCountryCode());
+
+        if (existingCountry == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        existingCountry.setName(countryDTO.getName());
+        countryService.saveCountry(existingCountry);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
