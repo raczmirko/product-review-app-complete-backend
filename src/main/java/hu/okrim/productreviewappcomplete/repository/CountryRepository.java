@@ -13,6 +13,4 @@ public interface CountryRepository extends CrudRepository<Country, String> {
     List<Country> findByOrderByNameAsc();
 
     Page<Country> findAll(Specification<Country> specification, Pageable pageable);
-
-    void deleteAllByCountryCode(String countryCode);
 }
