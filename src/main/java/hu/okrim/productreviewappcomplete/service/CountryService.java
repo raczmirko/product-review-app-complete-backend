@@ -10,7 +10,7 @@ import java.util.List;
 public interface CountryService {
     public Country getCountryByCountryCode(String countryCode);
     public void saveCountry(Country country);
-    public void deleteCountryByCountryCode(String countryCode);
+    public void deleteByCountryCode(String countryCode);
     List<Country> getCountries();
     Page<Country> findAllBySpecification(Specification<Country> specification, Pageable pageable);
 }

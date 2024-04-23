@@ -28,8 +28,8 @@ public class CountryServiceImpl implements CountryService{
     }
 
     @Override
-    public void deleteCountryByCountryCode(String countryCode) {
-        countryRepository.deleteAllByCountryCode(countryCode);
+    public void deleteByCountryCode(String countryCode) {
+        countryRepository.deleteById(countryCode);
     }
 
     @Override
