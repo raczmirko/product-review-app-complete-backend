@@ -40,16 +40,16 @@ public class CountryController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping("/{id}/delete")
+    @PostMapping("/{countryCode}/delete")
     public ResponseEntity<HttpStatus> deleteCountry(@PathVariable("countryCode") String countryCode){
-        countryService.deleteCountryByCountryCode(countryCode);
+        countryService.deleteByCountryCode(countryCode);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/multi-delete/{countryCodes}")
     public ResponseEntity<HttpStatus> deleteCountries(@PathVariable("countryCodes") String[] countryCodes){
         for(String countryCode : countryCodes) {
-            countryService.deleteCountryByCountryCode(countryCode);
+            countryService.deleteByCountryCode(countryCode);
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
