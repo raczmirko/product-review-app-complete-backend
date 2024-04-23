@@ -27,6 +27,21 @@ public class CountrySpecificationBuilder<Country> {
         return this;
     }
 
+    public CountrySpecificationBuilder<Country> withQuickFilterValues(List<String> quickFilterValues) {
+        if (quickFilterValues != null && !quickFilterValues.isEmpty()) {
+            List<Specification<Country>> orSpecifications = new ArrayList<>();
+            for (String value : quickFilterValues) {
+                orSpecifications.add((root, query, builder) ->
+                        builder.or(
+                                builder.like(root.get("name"), "%" + value + "%"),
+                                builder.like(root.get("countryCode"), "%" + value + "%")
+                        ));
+            }
+            specifications.add(Specification.where(orSpecifications.stream().reduce((a, b) -> a.or(b)).orElse(null)));
+        }
+        return this;
+    }
+
     public Specification<Country> build() {
         if (specifications.isEmpty()) {
             return null; // No criteria specified

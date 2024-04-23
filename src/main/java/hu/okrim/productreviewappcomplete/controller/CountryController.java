@@ -70,6 +70,7 @@ public class CountryController {
     @GetMapping("/search")
     public ResponseEntity<Page<Country>> searchCountries(@RequestParam(value = "searchText", required = false) String searchText,
                                                     @RequestParam(value = "searchColumn", required = false) String searchColumn,
+                                                    @RequestParam(value = "quickFilterValues", required = false) String quickFilterValues,
                                                     @RequestParam("pageSize") Integer pageSize,
                                                     @RequestParam("pageNumber") Integer pageNumber,
                                                     @RequestParam("orderByColumn") String orderByColumn,
@@ -82,6 +83,12 @@ public class CountryController {
                 default -> {
                 }
                 // Handle unknown search columns
+            }
+        }
+        else {
+            if(quickFilterValues != null && !quickFilterValues.isEmpty()){
+                // When searchColumn is not provided all fields are searched
+                countryCountrySpecificationBuilder.withQuickFilterValues(List.of(quickFilterValues.split(",")));
             }
         }
         Specification<Country> specification = countryCountrySpecificationBuilder.build();
