@@ -3,6 +3,7 @@ package hu.okrim.productreviewappcomplete.controller;
 import hu.okrim.productreviewappcomplete.dto.BrandDTO;
 import hu.okrim.productreviewappcomplete.mapper.BrandMapper;
 import hu.okrim.productreviewappcomplete.model.Brand;
+import hu.okrim.productreviewappcomplete.model.Category;
 import hu.okrim.productreviewappcomplete.service.BrandService;
 import hu.okrim.productreviewappcomplete.specification.BrandSpecificationBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,11 @@ public class BrandController {
 
     @GetMapping("/all")
     public ResponseEntity<List<Brand>> getBrands() {
-        return new ResponseEntity<>(brandService.getBrands(), HttpStatus.OK);
+        List<Brand> brands = brandService.getBrands();
+        if (brands.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(brands, HttpStatus.OK);
     }
     @PostMapping("/{id}/delete")
     public ResponseEntity<HttpStatus> deleteBrand(@PathVariable("id") Long id){

@@ -31,7 +31,11 @@ public class CountryController {
 
     @GetMapping("/all")
     public ResponseEntity<List<Country>> getCountries() {
-        return new ResponseEntity<>(countryService.getCountries(), HttpStatus.OK);
+        List<Country> countries = countryService.getCountries();
+        if (countries.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(countries, HttpStatus.OK);
     }
 
     @PostMapping("/create")
