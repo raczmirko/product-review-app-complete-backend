@@ -12,6 +12,5 @@ import java.util.List;
 @Repository
 public interface BrandRepository extends JpaRepository<Brand, Long> {
     List<Brand> findAllByOrderByName();
-
     Page<Brand> findAll(Specification<Brand> specification, Pageable pageable);
 }
