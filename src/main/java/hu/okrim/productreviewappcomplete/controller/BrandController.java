@@ -22,7 +22,6 @@ import java.util.List;
 public class BrandController {
     @Autowired
     BrandService brandService;
-    @Autowired
 
     @GetMapping("/all")
     public ResponseEntity<List<Brand>> getBrands() {
