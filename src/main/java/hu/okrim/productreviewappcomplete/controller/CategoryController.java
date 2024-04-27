@@ -1,14 +1,15 @@
 package hu.okrim.productreviewappcomplete.controller;
 
-import hu.okrim.productreviewappcomplete.dto.BrandDTO;
 import hu.okrim.productreviewappcomplete.dto.CategoryDTO;
-import hu.okrim.productreviewappcomplete.mapper.BrandMapper;
-import hu.okrim.productreviewappcomplete.mapper.CategoryMapper;
-import hu.okrim.productreviewappcomplete.model.Brand;
 import hu.okrim.productreviewappcomplete.model.Category;
-import hu.okrim.productreviewappcomplete.repository.CategoryRepository;
 import hu.okrim.productreviewappcomplete.service.CategoryService;
+import hu.okrim.productreviewappcomplete.specification.CategorySpecificationBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,11 @@ public class CategoryController {
 
     @GetMapping("/all")
     public ResponseEntity<List<Category>> getCategories() {
-        return new ResponseEntity<>(categoryService.getCategories(), HttpStatus.OK);
+        List<Category> categories = categoryService.getCategories();
+        if (categories.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(categories, HttpStatus.OK);
     }
     @PostMapping("/{id}/delete")
     public ResponseEntity<HttpStatus> deleteCategory(@PathVariable("id") Long id){
@@ -58,7 +63,42 @@ public class CategoryController {
 
     @PostMapping("/create")
     public ResponseEntity<HttpStatus> createCategory(@RequestBody CategoryDTO categoryDTO){
-        categoryService.saveCategory(CategoryMapper.mapToCategory(categoryDTO));
+        Category category = new Category(categoryDTO.getName(), categoryDTO.getDescription());
+        if(categoryDTO.getParentCategory() != null) category.setParentCategory(categoryDTO.getParentCategory());
+        categoryService.saveCategory(category);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<Category >> searchBrands(@RequestParam(value = "searchText", required = false) String searchText,
+                                                    @RequestParam(value = "searchColumn", required = false) String searchColumn,
+                                                    @RequestParam(value = "quickFilterValues", required = false) String quickFilterValues,
+                                                    @RequestParam("pageSize") Integer pageSize,
+                                                    @RequestParam("pageNumber") Integer pageNumber,
+                                                    @RequestParam("orderByColumn") String orderByColumn,
+                                                    @RequestParam("orderByDirection") String orderByDirection ) {
+
+        CategorySpecificationBuilder<Category> categoryCategorySpecificationBuilder = new CategorySpecificationBuilder<>();
+        if (searchColumn != null) {
+            switch (searchColumn) {
+                case "id" -> categoryCategorySpecificationBuilder.withId(searchText);
+                case "name" -> categoryCategorySpecificationBuilder.withName(searchText);
+                case "description" -> categoryCategorySpecificationBuilder.withDescription(searchText);
+                case "parentCategory" -> categoryCategorySpecificationBuilder.withParentCategory(searchText);
+                default -> {
+
+                }
+            }
+        }
+        else {
+            if(quickFilterValues != null && !quickFilterValues.isEmpty()){
+                // When searchColumn is not provided all fields are searched
+                categoryCategorySpecificationBuilder.withQuickFilterValues(List.of(quickFilterValues.split(",")));
+            }
+        }
+        Specification<Category> specification = categoryCategorySpecificationBuilder.build();
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(orderByDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderByColumn));
+        Page<Category> categoryPage = categoryService.findAllBySpecification(specification, pageable);
+        return ResponseEntity.ok(categoryPage);
     }
 }
