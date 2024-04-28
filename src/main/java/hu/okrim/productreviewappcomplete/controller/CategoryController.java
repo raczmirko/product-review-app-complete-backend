@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -31,9 +32,17 @@ public class CategoryController {
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
     @PostMapping("/{id}/delete")
-    public ResponseEntity<HttpStatus> deleteCategory(@PathVariable("id") Long id){
-        categoryService.deleteCategoryById(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<?> deleteCategory(@PathVariable("id") Long id){
+        try {
+            categoryService.deleteCategoryById(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception ex) {
+            String errorMessage = ex.getMessage();
+            if(ex.getMessage().contains("The DELETE statement conflicted with the SAME TABLE REFERENCE")) {
+                errorMessage = "This category cannot be deleted as it is the parent category of other categories. Delete the child-categories first!";
+            }
+            return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("multi-delete/{ids}")
