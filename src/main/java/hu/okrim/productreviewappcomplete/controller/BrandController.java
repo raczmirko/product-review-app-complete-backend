@@ -3,9 +3,9 @@ package hu.okrim.productreviewappcomplete.controller;
 import hu.okrim.productreviewappcomplete.dto.BrandDTO;
 import hu.okrim.productreviewappcomplete.mapper.BrandMapper;
 import hu.okrim.productreviewappcomplete.model.Brand;
-import hu.okrim.productreviewappcomplete.model.Category;
 import hu.okrim.productreviewappcomplete.service.BrandService;
 import hu.okrim.productreviewappcomplete.specification.BrandSpecificationBuilder;
+import hu.okrim.productreviewappcomplete.util.SqlExceptionMessageHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,17 +33,29 @@ public class BrandController {
         return new ResponseEntity<>(brands, HttpStatus.OK);
     }
     @PostMapping("/{id}/delete")
-    public ResponseEntity<HttpStatus> deleteBrand(@PathVariable("id") Long id){
-        brandService.deleteBrandById(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<?> deleteBrand(@PathVariable("id") Long id){
+        try {
+            brandService.deleteBrandById(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        catch (Exception ex) {
+            String message = SqlExceptionMessageHandler.brandDeleteErrorMessage(ex);
+            return new ResponseEntity<>(message, HttpStatus.CONFLICT);
+        }
     }
 
     @PostMapping("multi-delete/{ids}")
-    public ResponseEntity<HttpStatus> deleteBrands(@PathVariable("ids") Long[] ids){
-        for(Long id : ids) {
-            brandService.deleteBrandById(id);
+    public ResponseEntity<?> deleteBrands(@PathVariable("ids") Long[] ids){
+        try {
+            for(Long id : ids) {
+                brandService.deleteBrandById(id);
+            }
+            return new ResponseEntity<>(HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        catch (Exception ex) {
+            String message = SqlExceptionMessageHandler.brandDeleteErrorMessage(ex);
+            return new ResponseEntity<>(message, HttpStatus.CONFLICT);
+        }
     }
 
     @PutMapping("/{id}/modify")

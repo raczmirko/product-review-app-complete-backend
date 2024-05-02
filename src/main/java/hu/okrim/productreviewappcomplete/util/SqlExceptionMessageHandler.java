@@ -1,12 +1,10 @@
 package hu.okrim.productreviewappcomplete.util;
 
-import java.sql.SQLException;
-
 public class SqlExceptionMessageHandler {
-    public static String brandDeleteErrorMessage (SQLException ex) {
+    public static String brandDeleteErrorMessage (Exception ex) {
         String errorMessage = ex.getMessage();
-        if (errorMessage.contains("fk_review_c")) {
-            errorMessage = "";
+        if (errorMessage.contains("fk_article_brand")) {
+            errorMessage = "DELETION FAILED: This brand already has at least one article.";
         }
         return errorMessage;
     }
