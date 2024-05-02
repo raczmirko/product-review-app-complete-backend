@@ -1,12 +1,11 @@
 package hu.okrim.productreviewappcomplete.controller;
 
-import hu.okrim.productreviewappcomplete.dto.BrandDTO;
 import hu.okrim.productreviewappcomplete.dto.CountryDTO;
 import hu.okrim.productreviewappcomplete.mapper.CountryMapper;
-import hu.okrim.productreviewappcomplete.model.Brand;
 import hu.okrim.productreviewappcomplete.model.Country;
 import hu.okrim.productreviewappcomplete.service.CountryService;
 import hu.okrim.productreviewappcomplete.specification.CountrySpecificationBuilder;
+import hu.okrim.productreviewappcomplete.util.SqlExceptionMessageHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -45,17 +44,29 @@ public class CountryController {
     }
 
     @PostMapping("/{countryCode}/delete")
-    public ResponseEntity<HttpStatus> deleteCountry(@PathVariable("countryCode") String countryCode){
-        countryService.deleteByCountryCode(countryCode);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<?> deleteCountry(@PathVariable("countryCode") String countryCode){
+        try {
+            countryService.deleteByCountryCode(countryCode);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        catch (Exception ex) {
+            String message = SqlExceptionMessageHandler.countryDeleteErrorMessage(ex);
+            return new ResponseEntity<>(message, HttpStatus.CONFLICT);
+        }
     }
 
     @PostMapping("/multi-delete/{countryCodes}")
-    public ResponseEntity<HttpStatus> deleteCountries(@PathVariable("countryCodes") String[] countryCodes){
-        for(String countryCode : countryCodes) {
-            countryService.deleteByCountryCode(countryCode);
+    public ResponseEntity<?> deleteCountries(@PathVariable("countryCodes") String[] countryCodes){
+        try{
+            for(String countryCode : countryCodes) {
+                countryService.deleteByCountryCode(countryCode);
+            }
+            return new ResponseEntity<>(HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        catch (Exception ex) {
+            String message = SqlExceptionMessageHandler.countryDeleteErrorMessage(ex);
+            return  new ResponseEntity<>(message, HttpStatus.CONFLICT);
+        }
     }
 
     @PutMapping("/{id}/modify")
