@@ -21,4 +21,20 @@ public class SqlExceptionMessageHandler {
         }
         return errorMessage;
     }
+    public static String categoryDeleteErrorMessage (Exception ex) {
+        String errorMessage = ex.getMessage();
+        if(errorMessage.contains("fk_category_category")) {
+            errorMessage = "DELETION FAILED: This category has subcategories.";
+        }
+        else if (errorMessage.contains("fk_category_x_characteristic_category")) {
+            errorMessage = "DELETION FAILED: This category has characteristics assigned already.";
+        }
+        else if (errorMessage.contains("fk_article_category")) {
+            errorMessage = "DELETION FAILED: This category has articles.";
+        }
+        else if (errorMessage.contains("fk_aspect_category")) {
+            errorMessage = "DELETION FAILED: This category has review aspects associated to it.";
+        }
+        return errorMessage;
+    }
 }

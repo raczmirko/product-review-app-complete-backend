@@ -4,6 +4,7 @@ import hu.okrim.productreviewappcomplete.dto.CategoryDTO;
 import hu.okrim.productreviewappcomplete.model.Category;
 import hu.okrim.productreviewappcomplete.service.CategoryService;
 import hu.okrim.productreviewappcomplete.specification.CategorySpecificationBuilder;
+import hu.okrim.productreviewappcomplete.util.SqlExceptionMessageHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -37,18 +37,20 @@ public class CategoryController {
             categoryService.deleteCategoryById(id);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception ex) {
-            String errorMessage = ex.getMessage();
-            if(ex.getMessage().contains("The DELETE statement conflicted with the SAME TABLE REFERENCE")) {
-                errorMessage = "This category cannot be deleted as it is the parent category of other categories. Delete the child-categories first!";
-            }
-            return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+            String errorMessage = SqlExceptionMessageHandler.categoryDeleteErrorMessage(ex);
+            return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
         }
     }
 
     @PostMapping("multi-delete/{ids}")
-    public ResponseEntity<HttpStatus> deleteCategories(@PathVariable("ids") Long[] ids){
+    public ResponseEntity<?> deleteCategories(@PathVariable("ids") Long[] ids){
         for(Long id : ids) {
-            categoryService.deleteCategoryById(id);
+            try {
+                categoryService.deleteCategoryById(id);
+            } catch (Exception ex) {
+                String errorMessage = SqlExceptionMessageHandler.categoryDeleteErrorMessage(ex);
+                return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
+            }
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -109,5 +111,13 @@ public class CategoryController {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(orderByDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderByColumn));
         Page<Category> categoryPage = categoryService.findAllBySpecification(specification, pageable);
         return ResponseEntity.ok(categoryPage);
+    }
+
+    private String getDeleteExceptionMessage(Exception ex) {
+        String errorMessage = ex.getMessage();
+        if (ex.getMessage().contains("The DELETE statement conflicted with the SAME TABLE REFERENCE")) {
+            errorMessage = "Some of the categories cannot be deleted as they are the parent category of other categories. Delete the child-categories first!";
+        }
+        return errorMessage;
     }
 }
