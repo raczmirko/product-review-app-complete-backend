@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,6 +20,12 @@ public class CategoryServiceImpl implements CategoryService{
     public Category findCategoryById(Long id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(id, Category.class));
+    }
+
+    @Override
+    public List<Category> findSubCategories(Category category) {
+        return categoryRepository.findAllByParentCategoryId(category.getId())
+                .orElse(new ArrayList<>());
     }
 
     @Override
