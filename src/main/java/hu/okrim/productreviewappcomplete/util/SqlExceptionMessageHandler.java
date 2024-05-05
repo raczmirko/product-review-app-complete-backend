@@ -26,6 +26,9 @@ public class SqlExceptionMessageHandler {
         if (errorMessage.contains("Category hierarchy can not exceed 3 in depth.")) {
             errorMessage = "CREATION FAILED: Category hierarchy can not exceed 3 in depth.";
         }
+        if (errorMessage.contains("uq_category_name")) {
+            errorMessage = "CREATION FAILED: This category name already exists. Duplicate names are not allowed.";
+        }
         return errorMessage;
     }
     public static String categoryDeleteErrorMessage (Exception ex) {
