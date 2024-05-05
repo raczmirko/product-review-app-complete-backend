@@ -73,11 +73,17 @@ public class CategoryController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<HttpStatus> createCategory(@RequestBody CategoryDTO categoryDTO){
+    public ResponseEntity<?> createCategory(@RequestBody CategoryDTO categoryDTO){
         Category category = new Category(categoryDTO.getName(), categoryDTO.getDescription());
         if(categoryDTO.getParentCategory() != null) category.setParentCategory(categoryDTO.getParentCategory());
-        categoryService.saveCategory(category);
-        return new ResponseEntity<>(HttpStatus.OK);
+        try {
+            categoryService.saveCategory(category);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        catch (Exception ex) {
+            String message = SqlExceptionMessageHandler.categoryCreateErrorMessage(ex);
+            return new ResponseEntity<>(message, HttpStatus.CONFLICT);
+        }
     }
 
     @GetMapping("/search")

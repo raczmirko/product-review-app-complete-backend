@@ -21,6 +21,13 @@ public class SqlExceptionMessageHandler {
         }
         return errorMessage;
     }
+    public static String categoryCreateErrorMessage (Exception ex) {
+        String errorMessage = ex.getMessage();
+        if (errorMessage.contains("Category hierarchy can not exceed 3 in depth.")) {
+            errorMessage = "CREATION FAILED: Category hierarchy can not exceed 3 in depth.";
+        }
+        return errorMessage;
+    }
     public static String categoryDeleteErrorMessage (Exception ex) {
         String errorMessage = ex.getMessage();
         if(errorMessage.contains("fk_category_category")) {
