@@ -88,8 +88,7 @@ public class CharacteristicSpecificationBuilder<Characteristic> {
                                 builder.like(root.get("name"), "%" + value + "%"),
                                 builder.like(root.get("unitOfMeasureName"), "%" + value + "%"),
                                 builder.like(root.get("unitOfMeasure"), "%" + value + "%"),
-                                builder.like(root.get("description"), "%" + value + "%"),
-                                builder.like(root.join("categories", JoinType.LEFT).get("name"), "%" + value + "%")
+                                builder.like(root.get("description"), "%" + value + "%")
                         ));
             }
             specifications.add(Specification.where(orSpecifications.stream().reduce((a, b) -> a.or(b)).orElse(null)));

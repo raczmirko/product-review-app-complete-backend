@@ -18,5 +18,4 @@ public class CharacteristicDTO {
     private String unitOfMeasureName;
     private String unitOfMeasure;
     private String description;
-    private Set<Category> categories;
 }

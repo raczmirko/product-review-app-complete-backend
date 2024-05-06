@@ -27,6 +27,4 @@ public class Characteristic {
     private String unitOfMeasure;
     @Column(length = 100)
     private String description;
-    @ManyToMany(mappedBy = "characteristics")
-    private Set<Category> categories;
 }
