@@ -118,12 +118,4 @@ public class CategoryController {
         Page<Category> categoryPage = categoryService.findAllBySpecification(specification, pageable);
         return ResponseEntity.ok(categoryPage);
     }
-
-    private String getDeleteExceptionMessage(Exception ex) {
-        String errorMessage = ex.getMessage();
-        if (ex.getMessage().contains("The DELETE statement conflicted with the SAME TABLE REFERENCE")) {
-            errorMessage = "Some of the categories cannot be deleted as they are the parent category of other categories. Delete the child-categories first!";
-        }
-        return errorMessage;
-    }
 }
