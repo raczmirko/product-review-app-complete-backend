@@ -4,6 +4,9 @@ import hu.okrim.productreviewappcomplete.exception.EntityNotFoundException;
 import hu.okrim.productreviewappcomplete.model.Characteristic;
 import hu.okrim.productreviewappcomplete.repository.CharacteristicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,5 +35,10 @@ public class CharacteristicServiceImpl implements CharacteristicService {
     @Override
     public void saveCharacteristic(Characteristic characteristic) {
         characteristicRepository.save(characteristic);
+    }
+
+    @Override
+    public Page<Characteristic> findAllBySpecification(Specification<Characteristic> specification, Pageable pageable) {
+        return characteristicRepository.findAll(specification, pageable);
     }
 }
