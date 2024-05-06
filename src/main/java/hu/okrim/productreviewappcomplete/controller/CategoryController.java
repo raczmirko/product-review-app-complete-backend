@@ -87,7 +87,7 @@ public class CategoryController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<Category >> searchBrands(@RequestParam(value = "searchText", required = false) String searchText,
+    public ResponseEntity<Page<Category >> searchCategories(@RequestParam(value = "searchText", required = false) String searchText,
                                                     @RequestParam(value = "searchColumn", required = false) String searchColumn,
                                                     @RequestParam(value = "quickFilterValues", required = false) String quickFilterValues,
                                                     @RequestParam("pageSize") Integer pageSize,
