@@ -116,6 +116,6 @@ public class CategoryController {
         Specification<Category> specification = categoryCategorySpecificationBuilder.build();
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(orderByDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderByColumn));
         Page<Category> categoryPage = categoryService.findAllBySpecification(specification, pageable);
-        return ResponseEntity.ok(categoryPage);
+        return new ResponseEntity<>(categoryPage, HttpStatus.OK);
     }
 }

@@ -87,7 +87,7 @@ public class CharacteristicsController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<Characteristic >> searchCharacteristics(@RequestParam(value = "searchText", required = false) String searchText,
+    public ResponseEntity<Page<Characteristic>> searchCharacteristics(@RequestParam(value = "searchText", required = false) String searchText,
                                                         @RequestParam(value = "searchColumn", required = false) String searchColumn,
                                                         @RequestParam(value = "quickFilterValues", required = false) String quickFilterValues,
                                                         @RequestParam("pageSize") Integer pageSize,
@@ -118,6 +118,6 @@ public class CharacteristicsController {
         Specification<Characteristic> specification = characteristicCharacteristicSpecificationBuilder.build();
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(orderByDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderByColumn));
         Page<Characteristic> characteristicPage = characteristicService.findAllBySpecification(specification, pageable);
-        return ResponseEntity.ok(characteristicPage);
+        return new ResponseEntity<>(characteristicPage ,HttpStatus.OK);
     }
 }

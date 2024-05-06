@@ -111,6 +111,6 @@ public class BrandController {
         Specification<Brand> specification = brandBrandSpecificationBuilder.build();
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(orderByDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderByColumn));
         Page<Brand> brandsPage = brandService.findAllBySpecification(specification, pageable);
-        return ResponseEntity.ok(brandsPage);
+        return new ResponseEntity<>(brandsPage, HttpStatus.OK);
     }
 }
