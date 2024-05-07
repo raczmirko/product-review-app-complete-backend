@@ -1,5 +1,6 @@
 package hu.okrim.productreviewappcomplete.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,6 +25,7 @@ public class Category {
     private Category parentCategory;
     @Column(length = 1000)
     private String description;
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "category_x_characteristic",
