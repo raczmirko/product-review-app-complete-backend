@@ -49,17 +49,20 @@ public class SqlExceptionMessageHandler {
     }
 
     public static String characteristicDeleteErrorMessage(Exception ex) {
-//        String errorMessage = ex.getMessage();
-//        if(errorMessage.contains("")) {
-//
-//        }
-        return null;
+        String errorMessage = ex.getMessage();
+        if(errorMessage.contains("fk_category_x_characteristic_characteristic")) {
+            errorMessage = "DELETION FAILED: This characteristic is already assigned to at " +
+                    "least one category.";
+        }
+        return errorMessage;
     }
 
     public static String characteristicCreateErrorMessage(Exception ex) {
         String errorMessage = ex.getMessage();
         if(errorMessage.contains("Modifying characteristics that already describe a category is not allowed.")) {
-            errorMessage = "Modifying characteristics that already describe a category is not allowed.";
+            errorMessage = "UPDATE FAILED: Modifying characteristics " +
+                    "that " +
+                    "already describe a category is not allowed.";
         }
         return errorMessage;
     }
