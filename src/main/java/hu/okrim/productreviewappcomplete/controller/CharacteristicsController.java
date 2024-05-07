@@ -55,6 +55,18 @@ public class CharacteristicsController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("/{id}/cascade-delete")
+    public ResponseEntity<?> cascadeDeleteCharacteristic(@PathVariable("id") Long id){
+        try {
+            characteristicService.findCharacteristicById(id).setCategories(null);
+            characteristicService.deleteCharacteristicById(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception ex) {
+            String errorMessage = SqlExceptionMessageHandler.characteristicDeleteErrorMessage(ex);
+            return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
+        }
+    }
+
     @PutMapping("/{id}/modify")
     public ResponseEntity<?> modifyCharacteristic(@PathVariable("id") Long id, @RequestBody CharacteristicDTO characteristicDTO){
         Characteristic existingCharacteristic = characteristicService.findCharacteristicById(id);

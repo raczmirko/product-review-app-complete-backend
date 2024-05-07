@@ -10,7 +10,8 @@ public class CharacteristicMapper {
                 characteristic.getName(),
                 characteristic.getUnitOfMeasureName(),
                 characteristic.getUnitOfMeasure(),
-                characteristic.getDescription()
+                characteristic.getDescription(),
+                characteristic.getCategories()
         );
     }
     public static Characteristic mapToCharacteristic (CharacteristicDTO characteristicDTO){
@@ -19,7 +20,8 @@ public class CharacteristicMapper {
                 characteristicDTO.getName(),
                 characteristicDTO.getUnitOfMeasureName(),
                 characteristicDTO.getUnitOfMeasure(),
-                characteristicDTO.getDescription()
+                characteristicDTO.getDescription(),
+                characteristicDTO.getCategories()
         );
     }
 }
