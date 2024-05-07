@@ -47,4 +47,20 @@ public class SqlExceptionMessageHandler {
         }
         return errorMessage;
     }
+
+    public static String characteristicDeleteErrorMessage(Exception ex) {
+//        String errorMessage = ex.getMessage();
+//        if(errorMessage.contains("")) {
+//
+//        }
+        return null;
+    }
+
+    public static String characteristicCreateErrorMessage(Exception ex) {
+        String errorMessage = ex.getMessage();
+        if(errorMessage.contains("Modifying characteristics that already describe a category is not allowed.")) {
+            errorMessage = "Modifying characteristics that already describe a category is not allowed.";
+        }
+        return errorMessage;
+    }
 }

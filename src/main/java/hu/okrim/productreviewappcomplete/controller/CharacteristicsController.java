@@ -56,20 +56,23 @@ public class CharacteristicsController {
     }
 
     @PutMapping("/{id}/modify")
-    public ResponseEntity<HttpStatus> modifyCharacteristic(@PathVariable("id") Long id, @RequestBody CharacteristicDTO characteristicDTO){
+    public ResponseEntity<?> modifyCharacteristic(@PathVariable("id") Long id, @RequestBody CharacteristicDTO characteristicDTO){
         Characteristic existingCharacteristic = characteristicService.findCharacteristicById(id);
 
         if (existingCharacteristic == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        existingCharacteristic.setName(characteristicDTO.getName());
-        existingCharacteristic.setUnitOfMeasureName(characteristicDTO.getUnitOfMeasureName());
-        existingCharacteristic.setUnitOfMeasure(characteristicDTO.getUnitOfMeasure());
-        existingCharacteristic.setDescription(characteristicDTO.getDescription());
-
-        characteristicService.saveCharacteristic(existingCharacteristic);
-
+        try {
+            existingCharacteristic.setName(characteristicDTO.getName());
+            existingCharacteristic.setUnitOfMeasureName(characteristicDTO.getUnitOfMeasureName());
+            existingCharacteristic.setUnitOfMeasure(characteristicDTO.getUnitOfMeasure());
+            existingCharacteristic.setDescription(characteristicDTO.getDescription());
+            characteristicService.saveCharacteristic(existingCharacteristic);
+        }
+        catch (Exception ex) {
+            String errorMessage = SqlExceptionMessageHandler.characteristicCreateErrorMessage(ex);
+            return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
+        }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
