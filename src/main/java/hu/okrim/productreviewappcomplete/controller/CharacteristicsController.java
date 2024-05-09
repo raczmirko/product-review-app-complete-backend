@@ -2,6 +2,7 @@ package hu.okrim.productreviewappcomplete.controller;
 
 import hu.okrim.productreviewappcomplete.dto.CharacteristicDTO;
 import hu.okrim.productreviewappcomplete.mapper.CharacteristicMapper;
+import hu.okrim.productreviewappcomplete.model.Category;
 import hu.okrim.productreviewappcomplete.model.Characteristic;
 import hu.okrim.productreviewappcomplete.service.CharacteristicService;
 import hu.okrim.productreviewappcomplete.specification.CharacteristicSpecificationBuilder;
@@ -16,7 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/characteristic")
@@ -58,8 +61,17 @@ public class CharacteristicsController {
     @PostMapping("/{id}/cascade-delete")
     public ResponseEntity<?> cascadeDeleteCharacteristic(@PathVariable("id") Long id){
         try {
-            characteristicService.findCharacteristicById(id).setCategories(null);
+            Characteristic foundCharacteristic = characteristicService.findCharacteristicById(id);
+            Set<Category> categories = foundCharacteristic.getCategories();
+
+            // Remove the characteristic from all categories
+            for (Category category : categories) {
+                category.getCharacteristics().remove(foundCharacteristic);
+            }
+
+            // Delete the characteristic
             characteristicService.deleteCharacteristicById(id);
+
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception ex) {
             String errorMessage = SqlExceptionMessageHandler.characteristicDeleteErrorMessage(ex);
