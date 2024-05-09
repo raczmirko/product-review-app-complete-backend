@@ -1,9 +1,11 @@
 package hu.okrim.productreviewappcomplete.controller;
 
+import hu.okrim.productreviewappcomplete.dto.CategoryHierarchyDTO;
 import hu.okrim.productreviewappcomplete.dto.CharacteristicDTO;
 import hu.okrim.productreviewappcomplete.mapper.CharacteristicMapper;
 import hu.okrim.productreviewappcomplete.model.Category;
 import hu.okrim.productreviewappcomplete.model.Characteristic;
+import hu.okrim.productreviewappcomplete.service.CategoryService;
 import hu.okrim.productreviewappcomplete.service.CharacteristicService;
 import hu.okrim.productreviewappcomplete.specification.CharacteristicSpecificationBuilder;
 import hu.okrim.productreviewappcomplete.util.SqlExceptionMessageHandler;
@@ -17,7 +19,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -26,6 +29,8 @@ import java.util.Set;
 public class CharacteristicsController {
     @Autowired
     CharacteristicService characteristicService;
+    @Autowired
+    CategoryService categoryService;
     @GetMapping("/all")
     public ResponseEntity<List<Characteristic>> getCharacteristics() {
         List<Characteristic> characteristics = characteristicService.findAll();
@@ -130,7 +135,6 @@ public class CharacteristicsController {
                 case "description" -> characteristicCharacteristicSpecificationBuilder.withDescription(searchText);
                 case "unitOfMeasure" -> characteristicCharacteristicSpecificationBuilder.withUnitOfMeasure(searchText);
                 case "unitOfMeasureName" -> characteristicCharacteristicSpecificationBuilder.withUnitOfMeasureName(searchText);
-                case "categories" -> characteristicCharacteristicSpecificationBuilder.withCategoryName(searchText);
                 default -> {
 
                 }
@@ -146,5 +150,31 @@ public class CharacteristicsController {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(orderByDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderByColumn));
         Page<Characteristic> characteristicPage = characteristicService.findAllBySpecification(specification, pageable);
         return new ResponseEntity<>(characteristicPage ,HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/list-characteristic-category-trees")
+    public ResponseEntity<?> listCharacteristicCategories (@PathVariable("id") Long id) {
+        Characteristic characteristic = characteristicService.findCharacteristicById(id);
+        Set<Category> assignedCategories = characteristic.getCategories();
+        List<CategoryHierarchyDTO> assignedCategoryHierarchy = new ArrayList<>();
+        // Create the categoryHierarchy of each assigned category
+        for(Category assignedCategory: assignedCategories){
+            // Get all subcategories of current category
+            List<Category> currentSubcategories = categoryService.findSubCategories(assignedCategory);
+            // Iterate through each subcategory and get all further subcategories of each individual subcategory
+            // Each tree branch is saved in a map identified by the currentSubcategory ID and has a list of child elements assigned
+            HashMap<Long, List<Category>> subSubcategories = new HashMap<>();
+            for (Category category : currentSubcategories) {
+                // For each subcategory found create a list and save all subSubcategories of given subcategory
+                List<Category> currentBranchSubcategories = categoryService.findSubCategories(category);
+                subSubcategories.put(category.getId(), currentBranchSubcategories);
+            }
+            CategoryHierarchyDTO categoryHierarchyDTO = new CategoryHierarchyDTO();
+            categoryHierarchyDTO.setCurrentCategory(assignedCategory);
+            categoryHierarchyDTO.setCurrentSubcategories(currentSubcategories);
+            categoryHierarchyDTO.setSubSubcategories(subSubcategories);
+            assignedCategoryHierarchy.add(categoryHierarchyDTO);
+        }
+        return new ResponseEntity<>(assignedCategoryHierarchy, HttpStatus.OK);
     }
 }
