@@ -19,10 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/characteristic")
@@ -176,5 +173,31 @@ public class CharacteristicsController {
             assignedCategoryHierarchy.add(categoryHierarchyDTO);
         }
         return new ResponseEntity<>(assignedCategoryHierarchy, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/available-characteristics")
+    public ResponseEntity<Set<Characteristic>> getAvailableCharacteristics (@PathVariable("id") Long categoryId) {
+        // Find the category by the provided ID
+        Category category = categoryService.findCategoryById(categoryId);
+        // Find all characteristics
+        Set<Characteristic> availableCharacteristics = new HashSet<>(characteristicService.findAll());
+        // Find all characteristics that are already assigned to the category or one of its subcategories
+        Set<Characteristic> alreadyAssignedCharacteristics = new HashSet<>(getCharacteristicsOfCategoryAndAllSubcategories(category));
+        // Remove already assigned characteristics from available ones
+        availableCharacteristics.removeAll(alreadyAssignedCharacteristics);
+        return new ResponseEntity<>(availableCharacteristics, HttpStatus.OK);
+    }
+
+    public Set<Characteristic> getCharacteristicsOfCategoryAndAllSubcategories(Category category) {
+        // Create a list with the category and all subcategories
+        ArrayList<Category> categories = new ArrayList<>(categoryService.findSubCategories(category));
+        categories.add(category);
+        // Create a set that stores the result characteristics
+        Set<Characteristic> resultSet = new HashSet<>();
+        // Iterate through the categories and add all of their characteristics to the result set
+        for (Category c : categories) {
+            resultSet.addAll(c.getCharacteristics());
+        }
+        return resultSet;
     }
 }
