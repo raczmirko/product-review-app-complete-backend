@@ -157,13 +157,13 @@ public class CharacteristicsController {
         // Create the categoryHierarchy of each assigned category
         for(Category assignedCategory: assignedCategories){
             // Get all subcategories of current category
-            List<Category> currentSubcategories = categoryService.findSubCategories(assignedCategory);
+            List<Category> currentSubcategories = categoryService.findSubcategories(assignedCategory);
             // Iterate through each subcategory and get all further subcategories of each individual subcategory
             // Each tree branch is saved in a map identified by the currentSubcategory ID and has a list of child elements assigned
             HashMap<Long, List<Category>> subSubcategories = new HashMap<>();
             for (Category category : currentSubcategories) {
                 // For each subcategory found create a list and save all subSubcategories of given subcategory
-                List<Category> currentBranchSubcategories = categoryService.findSubCategories(category);
+                List<Category> currentBranchSubcategories = categoryService.findSubcategories(category);
                 subSubcategories.put(category.getId(), currentBranchSubcategories);
             }
             CategoryHierarchyDTO categoryHierarchyDTO = new CategoryHierarchyDTO();
@@ -182,15 +182,15 @@ public class CharacteristicsController {
         // Find all characteristics
         Set<Characteristic> availableCharacteristics = new HashSet<>(characteristicService.findAll());
         // Find all characteristics that are already assigned to the category or one of its subcategories
-        Set<Characteristic> alreadyAssignedCharacteristics = new HashSet<>(getCharacteristicsOfCategoryAndAllSubcategories(category));
+        Set<Characteristic> alreadyAssignedCharacteristics = new HashSet<>(getCharacteristicsOfCategoryTree(category));
         // Remove already assigned characteristics from available ones
         availableCharacteristics.removeAll(alreadyAssignedCharacteristics);
         return new ResponseEntity<>(availableCharacteristics, HttpStatus.OK);
     }
 
-    public Set<Characteristic> getCharacteristicsOfCategoryAndAllSubcategories(Category category) {
+    public Set<Characteristic> getCharacteristicsOfCategoryTree(Category category) {
         // Create a list with the category and all subcategories
-        ArrayList<Category> categories = new ArrayList<>(categoryService.findSubCategories(category));
+        ArrayList<Category> categories = new ArrayList<>(categoryService.findSubcategories(category));
         categories.add(category);
         // Create a set that stores the result characteristics
         Set<Characteristic> resultSet = new HashSet<>();

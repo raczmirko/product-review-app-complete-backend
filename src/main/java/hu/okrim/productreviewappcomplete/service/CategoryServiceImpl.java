@@ -23,7 +23,7 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public List<Category> findSubCategories(Category category) {
+    public List<Category> findSubcategories(Category category) {
         return categoryRepository.findAllByParentCategoryId(category.getId())
                 .orElse(new ArrayList<>());
     }

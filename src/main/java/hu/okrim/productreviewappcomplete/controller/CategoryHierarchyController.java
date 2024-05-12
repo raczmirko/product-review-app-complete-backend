@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -29,13 +28,13 @@ public class CategoryHierarchyController {
         Category currentParentCategory = currentCategory.getParentCategory();
         Category parentParentCategory = currentParentCategory != null ? currentParentCategory.getParentCategory() : null;
         // Get all subcategories of current category
-        List<Category> currentSubcategories = categoryService.findSubCategories(currentCategory);
+        List<Category> currentSubcategories = categoryService.findSubcategories(currentCategory);
         // Iterate through each subcategory and get all further subcategories of each individual subcategory
         // Each tree branch is saved in a map identified by the currentSubcategory ID and has a list of child elements assigned
         HashMap<Long, List<Category>> subSubcategories = new HashMap<>();
         for (Category category : currentSubcategories) {
             // For each subcategory found create a list and save all subSubcategories of given subcategory
-            List<Category> currentBranchSubcategories = categoryService.findSubCategories(category);
+            List<Category> currentBranchSubcategories = categoryService.findSubcategories(category);
             subSubcategories.put(category.getId(), currentBranchSubcategories);
         }
         // Create return object

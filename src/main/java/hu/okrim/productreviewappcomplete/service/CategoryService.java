@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface CategoryService {
     Category findCategoryById (Long id);
-    List<Category> findSubCategories (Category category);
+    List<Category> findSubcategories(Category category);
     void deleteCategoryById (Long id);
     void saveCategory (Category category);
     List<Category> getCategories();
