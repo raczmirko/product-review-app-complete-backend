@@ -64,17 +64,14 @@ public class CategoryController {
     @PutMapping("/{id}/modify")
     public ResponseEntity<HttpStatus> modifyCategory(@PathVariable("id") Long id, @RequestBody CategoryDTO categoryDTO){
         Category existingCategory = categoryService.findCategoryById(id);
-
         if (existingCategory == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
         existingCategory.setName(categoryDTO.getName());
         existingCategory.setDescription(categoryDTO.getDescription());
         existingCategory.setParentCategory(categoryDTO.getParentCategory());
-
+        existingCategory.setCharacteristics(categoryDTO.getCharacteristics());
         categoryService.saveCategory(existingCategory);
-
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
