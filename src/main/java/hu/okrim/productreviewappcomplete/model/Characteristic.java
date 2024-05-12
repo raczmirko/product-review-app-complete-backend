@@ -1,5 +1,6 @@
 package hu.okrim.productreviewappcomplete.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,6 +28,7 @@ public class Characteristic {
     private String unitOfMeasure;
     @Column(length = 100)
     private String description;
+    @JsonIgnore
     @ManyToMany(mappedBy = "characteristics")
     private Set<Category> categories;
 }

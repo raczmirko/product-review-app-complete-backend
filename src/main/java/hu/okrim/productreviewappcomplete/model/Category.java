@@ -25,7 +25,6 @@ public class Category {
     private Category parentCategory;
     @Column(length = 1000)
     private String description;
-    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "category_x_characteristic",
