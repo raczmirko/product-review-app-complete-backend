@@ -70,9 +70,10 @@ CREATE TABLE characteristic (
 );
 
 CREATE TABLE category_x_characteristic (
+    id int IDENTITY(1,1),
 	category int,
 	characteristic int,
-	CONSTRAINT pk_category_x_characteristic PRIMARY KEY (category, characteristic),
+	CONSTRAINT pk_category_x_characteristic PRIMARY KEY (id),
 	CONSTRAINT fk_category_x_characteristic_category FOREIGN KEY (category) REFERENCES category(id),
 	CONSTRAINT fk_category_x_characteristic_characteristic FOREIGN KEY (characteristic) REFERENCES characteristic(id)
 );
