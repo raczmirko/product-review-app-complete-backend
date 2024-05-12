@@ -11,7 +11,18 @@ The full database creation script is located in the <i> src/resources/db/create_
 > [!IMPORTANT]
 > You will need to have Microsoft SQL Server 16 or higher installed on your machine, as well as SQl Server Management Studio (SSMS). These are <b> only available on Windows. </b>
 > If you want to use your own password and username, you can modify this script, and then you <b> have to modify the application.properties file too </b> to add the new connection String to the database server!
+### SQL Server Network Configuration
+Since the application is a separate entity from the database server running on our machine, SQL Server has to be configured to enable the TCP/IP protocol to enable communications with the DB over the network.
+The easiest way of configuration is the graphical SQL Server Configuration Manager:
+1. Type "Configuration Manager" in the Windows search bar and you should see and option like <b> SQL Server [version] Configuration Manager </b>.
+2. Open the Configuration Manager and expand the SQL Server Network Configuration item in the left-hand menu.
+3. Click on the Protocols for [serverName] sub-item.
+4. On the right-hand side double click in the TCP/IP option (status should show Disabled at this point).
+5. In the popup modal, set the Enabled option to Yes. Click OK.
+6. SQL Server has to be restarted for the changes to take effect. Either restart your whole PC or just go the the SQL Server Services option in left-hand menu and right click/restart on the server.
 
+> [!IMPORTANT]
+> To get more information about configuring the SQL Server Network protocols read the official documentation [here](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/enable-or-disable-a-server-network-protocol).
 ### Authentiction mode
 > [!WARNING]
 > The database server's authentication mode must be changed from 'Windows 
