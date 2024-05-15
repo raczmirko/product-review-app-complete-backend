@@ -15,7 +15,7 @@ public class CategoryMapper {
     }
     public static Category mapToCategory (CategoryDTO categoryDTO){
         return new Category(
-                null,
+                categoryDTO.getId() != null ? categoryDTO.getId() : null,
                 categoryDTO.getName(),
                 categoryDTO.getParentCategory(),
                 categoryDTO.getDescription()

@@ -14,7 +14,7 @@ public class BrandMapper {
     }
     public static Brand mapToBrand (BrandDTO brandDTO){
         return new Brand(
-                null,
+                brandDTO.getId() != null ? brandDTO.getId() : null,
                 brandDTO.getName(),
                 brandDTO.getCountryOfOrigin(),
                 brandDTO.getDescription()

@@ -16,7 +16,7 @@ public class CharacteristicMapper {
     }
     public static Characteristic mapToCharacteristic (CharacteristicDTO characteristicDTO){
         return new Characteristic(
-                null,
+                characteristicDTO.getId() != null ? characteristicDTO.getId() : null,
                 characteristicDTO.getName(),
                 characteristicDTO.getUnitOfMeasureName(),
                 characteristicDTO.getUnitOfMeasure(),
