@@ -29,6 +29,30 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
+    public List<Category> findAllCategoriesInHierarchy(Category category) {
+        List<Category> categoryHierarchy = new ArrayList<>();
+        Category examinedCategory = category;
+        // Add current and all higher categories to return list
+        do {
+            categoryHierarchy.add(examinedCategory);
+            examinedCategory = examinedCategory.getParentCategory();
+        } while (examinedCategory != null);
+        // Add all subcategories to return list recursively
+        collectCategoriesInHierarchyRecursive(category, categoryHierarchy);
+        return categoryHierarchy;
+    }
+
+    private void collectCategoriesInHierarchyRecursive(Category category, List<Category> categoryHierarchy) {
+        // Add the current category to the hierarchy
+        categoryHierarchy.add(category);
+        // Recursively collect subcategories
+        List<Category> subcategories = findSubcategories(category);
+        for (Category subcategory : subcategories) {
+            collectCategoriesInHierarchyRecursive(subcategory, categoryHierarchy);
+        }
+    }
+
+    @Override
     public void deleteCategoryById(Long id) {
         categoryRepository.deleteById(id);
     }

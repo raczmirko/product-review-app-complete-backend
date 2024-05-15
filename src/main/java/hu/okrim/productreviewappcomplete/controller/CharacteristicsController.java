@@ -190,7 +190,7 @@ public class CharacteristicsController {
 
     public Set<Characteristic> getCharacteristicsOfCategoryTree(Category category) {
         // Create a list with the category and all subcategories
-        ArrayList<Category> categories = new ArrayList<>(categoryService.findSubcategories(category));
+        ArrayList<Category> categories = new ArrayList<>(categoryService.findAllCategoriesInHierarchy(category));
         categories.add(category);
         // Create a set that stores the result characteristics
         Set<Characteristic> resultSet = new HashSet<>();
@@ -199,5 +199,16 @@ public class CharacteristicsController {
             resultSet.addAll(c.getCharacteristics());
         }
         return resultSet;
+    }
+
+    @GetMapping("/{id}/list-inherited-characteristics")
+    public ResponseEntity<?> listInheritedCharacteristics (@PathVariable("id") Long categoryId) {
+        Category category = categoryService.findCategoryById(categoryId);
+        List<Characteristic> inheritedCharacteristics = new ArrayList<>();
+        while(category.getParentCategory() != null) {
+            category = category.getParentCategory();
+            inheritedCharacteristics.addAll(category.getCharacteristics());
+        }
+        return new ResponseEntity<>(inheritedCharacteristics, HttpStatus.OK);
     }
 }
