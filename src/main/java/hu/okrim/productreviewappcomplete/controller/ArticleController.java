@@ -80,7 +80,7 @@ public class ArticleController {
             existingArticle.setName(articleDTO.getName());
             existingArticle.setBrand(articleDTO.getBrand());
             existingArticle.setCategory(articleDTO.getCategory());
-            existingArticle.setDescription(existingArticle.getDescription());
+            existingArticle.setDescription(articleDTO.getDescription());
             articleService.save(existingArticle);
         }
         catch (Exception ex) {
