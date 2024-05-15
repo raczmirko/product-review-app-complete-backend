@@ -6,6 +6,7 @@ import hu.okrim.productreviewappcomplete.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -64,7 +65,7 @@ public class CategoryServiceImpl implements CategoryService{
 
     @Override
     public List<Category> getCategories() {
-        return categoryRepository.findAll();
+        return categoryRepository.findAll(Sort.by(Sort.Direction.ASC, "name"));
     }
 
     @Override
