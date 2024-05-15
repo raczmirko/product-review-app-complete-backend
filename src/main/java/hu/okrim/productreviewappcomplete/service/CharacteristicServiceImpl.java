@@ -22,18 +22,18 @@ public class CharacteristicServiceImpl implements CharacteristicService {
     }
 
     @Override
-    public Characteristic findCharacteristicById(Long id) {
+    public Characteristic findById(Long id) {
         return characteristicRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(id, Characteristic.class));
     }
 
     @Override
-    public void deleteCharacteristicById(Long id) {
+    public void deleteById(Long id) {
         characteristicRepository.deleteById(id);
     }
 
     @Override
-    public void saveCharacteristic(Characteristic characteristic) {
+    public void save(Characteristic characteristic) {
         characteristicRepository.save(characteristic);
     }
 

@@ -9,8 +9,8 @@ import java.util.List;
 
 public interface CharacteristicService {
     List<Characteristic> findAll ();
-    Characteristic findCharacteristicById (Long id);
-    void deleteCharacteristicById (Long id);
-    void saveCharacteristic (Characteristic characteristic);
+    Characteristic findById(Long id);
+    void deleteById(Long id);
+    void save(Characteristic characteristic);
     Page<Characteristic> findAllBySpecification(Specification<Characteristic> specification, Pageable pageable);
 }

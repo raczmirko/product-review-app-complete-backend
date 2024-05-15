@@ -18,7 +18,7 @@ public class CategoryServiceImpl implements CategoryService{
     @Autowired
     CategoryRepository categoryRepository;
     @Override
-    public Category findCategoryById(Long id) {
+    public Category findById(Long id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(id, Category.class));
     }
@@ -54,17 +54,17 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public void deleteCategoryById(Long id) {
+    public void deleteById(Long id) {
         categoryRepository.deleteById(id);
     }
 
     @Override
-    public void saveCategory(Category category) {
+    public void save(Category category) {
         categoryRepository.save(category);
     }
 
     @Override
-    public List<Category> getCategories() {
+    public List<Category> findAll() {
         return categoryRepository.findAll(Sort.by(Sort.Direction.ASC, "name"));
     }
 

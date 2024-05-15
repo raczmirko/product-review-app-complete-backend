@@ -8,11 +8,11 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 
 public interface CategoryService {
-    Category findCategoryById (Long id);
+    Category findById(Long id);
     List<Category> findSubcategories(Category category);
     List<Category> findAllCategoriesInHierarchy(Category category);
-    void deleteCategoryById (Long id);
-    void saveCategory (Category category);
-    List<Category> getCategories();
+    void deleteById(Long id);
+    void save(Category category);
+    List<Category> findAll();
     Page<Category> findAllBySpecification(Specification<Category> specification, Pageable pageable);
 }

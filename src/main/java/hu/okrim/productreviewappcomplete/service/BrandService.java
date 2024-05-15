@@ -8,9 +8,9 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 
 public interface BrandService {
-    Brand findBrandById(Long id);
-    void deleteBrandById(Long id);
-    void saveBrand (Brand brand);
-    List<Brand> getBrands();
+    Brand findById(Long id);
+    void deleteById(Long id);
+    void save(Brand brand);
+    List<Brand> findAll();
     Page<Brand> findAllBySpecification(Specification<Brand> specification, Pageable pageable);
 }

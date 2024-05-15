@@ -25,12 +25,12 @@ public class CountryController {
     CountryService countryService;
     @GetMapping("/{id}")
     public ResponseEntity<String> findById(@PathVariable String countryCode) {
-        return new ResponseEntity<>(countryService.getCountryByCountryCode(countryCode).getName(), HttpStatus.OK);
+        return new ResponseEntity<>(countryService.findByCountryCode(countryCode).getName(), HttpStatus.OK);
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<Country>> getCountries() {
-        List<Country> countries = countryService.getCountries();
+        List<Country> countries = countryService.findAll();
         if (countries.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
@@ -39,7 +39,7 @@ public class CountryController {
 
     @PostMapping("/create")
     public ResponseEntity<HttpStatus> createCountry(@RequestBody CountryDTO countryDTO) {
-        countryService.saveCountry(CountryMapper.mapToCountry(countryDTO));
+        countryService.save(CountryMapper.mapToCountry(countryDTO));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -71,14 +71,14 @@ public class CountryController {
 
     @PutMapping("/{id}/modify")
     public ResponseEntity<HttpStatus> modifyCountry(@PathVariable("countryCode") String countryCode, @RequestBody CountryDTO countryDTO){
-        Country existingCountry = countryService.getCountryByCountryCode(countryDTO.getCountryCode());
+        Country existingCountry = countryService.findByCountryCode(countryDTO.getCountryCode());
 
         if (existingCountry == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         existingCountry.setName(countryDTO.getName());
-        countryService.saveCountry(existingCountry);
+        countryService.save(existingCountry);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

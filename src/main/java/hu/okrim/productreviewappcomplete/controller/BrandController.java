@@ -26,7 +26,7 @@ public class BrandController {
 
     @GetMapping("/all")
     public ResponseEntity<List<Brand>> getBrands() {
-        List<Brand> brands = brandService.getBrands();
+        List<Brand> brands = brandService.findAll();
         if (brands.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
@@ -35,7 +35,7 @@ public class BrandController {
     @PostMapping("/{id}/delete")
     public ResponseEntity<?> deleteBrand(@PathVariable("id") Long id){
         try {
-            brandService.deleteBrandById(id);
+            brandService.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);
         }
         catch (Exception ex) {
@@ -48,7 +48,7 @@ public class BrandController {
     public ResponseEntity<?> deleteBrands(@PathVariable("ids") Long[] ids){
         try {
             for(Long id : ids) {
-                brandService.deleteBrandById(id);
+                brandService.deleteById(id);
             }
             return new ResponseEntity<>(HttpStatus.OK);
         }
@@ -60,7 +60,7 @@ public class BrandController {
 
     @PutMapping("/{id}/modify")
     public ResponseEntity<HttpStatus> modifyBrand(@PathVariable("id") Long id, @RequestBody BrandDTO brandDTO){
-        Brand existingBrand = brandService.findBrandById(id);
+        Brand existingBrand = brandService.findById(id);
 
         if (existingBrand == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -70,14 +70,14 @@ public class BrandController {
         existingBrand.setDescription(brandDTO.getDescription());
         existingBrand.setCountryOfOrigin(brandDTO.getCountryOfOrigin());
 
-        brandService.saveBrand(existingBrand);
+        brandService.save(existingBrand);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/create")
     public ResponseEntity<HttpStatus> createBrand(@RequestBody BrandDTO brandDTO){
-        brandService.saveBrand(BrandMapper.mapToBrand(brandDTO));
+        brandService.save(BrandMapper.mapToBrand(brandDTO));
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

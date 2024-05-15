@@ -23,7 +23,7 @@ public class CategoryHierarchyController {
     @GetMapping("/{id}")
     public ResponseEntity<CategoryHierarchyDTO> getCategoryTree(@PathVariable("id") Long id) {
         // Get current category object by ID
-        Category currentCategory = categoryService.findCategoryById(id);
+        Category currentCategory = categoryService.findById(id);
         // Get currentParent and parentParent categories (if they exist)
         Category currentParentCategory = currentCategory.getParentCategory();
         Category parentParentCategory = currentParentCategory != null ? currentParentCategory.getParentCategory() : null;

@@ -18,12 +18,12 @@ public class CountryServiceImpl implements CountryService{
     @Autowired
     CountryRepository countryRepository;
     @Override
-    public Country getCountryByCountryCode(String countryCode) {
+    public Country findByCountryCode(String countryCode) {
         return null;
     }
 
     @Override
-    public void saveCountry(Country country) {
+    public void save(Country country) {
         countryRepository.save(country);
     }
 
@@ -33,7 +33,7 @@ public class CountryServiceImpl implements CountryService{
     }
 
     @Override
-    public List<Country> getCountries() {
+    public List<Country> findAll() {
         return countryRepository.findByOrderByNameAsc();
     }
 

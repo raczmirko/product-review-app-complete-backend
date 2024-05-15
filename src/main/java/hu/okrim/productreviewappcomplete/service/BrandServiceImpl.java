@@ -18,23 +18,23 @@ public class BrandServiceImpl implements BrandService{
     @Autowired
     BrandRepository brandRepository;
     @Override
-    public Brand findBrandById(Long id) {
+    public Brand findById(Long id) {
         return brandRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(id, Brand.class));
     }
 
     @Override
-    public void deleteBrandById(Long id) {
+    public void deleteById(Long id) {
         brandRepository.deleteById(id);
     }
 
     @Override
-    public void saveBrand(Brand brand) {
+    public void save(Brand brand) {
         brandRepository.save(brand);
     }
 
     @Override
-    public List<Brand> getBrands() {
+    public List<Brand> findAll() {
         return brandRepository.findAllByOrderByName();
     }
 

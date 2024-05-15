@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
 import java.util.List;
 
 @RestController
@@ -26,7 +25,7 @@ public class CategoryController {
 
     @GetMapping("/all")
     public ResponseEntity<List<Category>> getCategories() {
-        List<Category> categories = categoryService.getCategories();
+        List<Category> categories = categoryService.findAll();
         if (categories.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
@@ -35,13 +34,13 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Category> getCategory(@PathVariable ("id") Long id) {
-        Category category = categoryService.findCategoryById(id);
+        Category category = categoryService.findById(id);
         return new ResponseEntity<>(category, HttpStatus.OK);
     }
     @PostMapping("/{id}/delete")
     public ResponseEntity<?> deleteCategory(@PathVariable("id") Long id){
         try {
-            categoryService.deleteCategoryById(id);
+            categoryService.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception ex) {
             String errorMessage = SqlExceptionMessageHandler.categoryDeleteErrorMessage(ex);
@@ -53,7 +52,7 @@ public class CategoryController {
     public ResponseEntity<?> deleteCategories(@PathVariable("ids") Long[] ids){
         for(Long id : ids) {
             try {
-                categoryService.deleteCategoryById(id);
+                categoryService.deleteById(id);
             } catch (Exception ex) {
                 String errorMessage = SqlExceptionMessageHandler.categoryDeleteErrorMessage(ex);
                 return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
@@ -64,7 +63,7 @@ public class CategoryController {
 
     @PutMapping("/{id}/modify")
     public ResponseEntity<HttpStatus> modifyCategory(@PathVariable("id") Long id, @RequestBody CategoryDTO categoryDTO){
-        Category existingCategory = categoryService.findCategoryById(id);
+        Category existingCategory = categoryService.findById(id);
         if (existingCategory == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -72,7 +71,7 @@ public class CategoryController {
         existingCategory.setDescription(categoryDTO.getDescription());
         existingCategory.setParentCategory(categoryDTO.getParentCategory());
         existingCategory.setCharacteristics(categoryDTO.getCharacteristics());
-        categoryService.saveCategory(existingCategory);
+        categoryService.save(existingCategory);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -81,7 +80,7 @@ public class CategoryController {
         Category category = new Category(categoryDTO.getName(), categoryDTO.getDescription());
         if(categoryDTO.getParentCategory() != null) category.setParentCategory(categoryDTO.getParentCategory());
         try {
-            categoryService.saveCategory(category);
+            categoryService.save(category);
             return new ResponseEntity<>(HttpStatus.OK);
         }
         catch (Exception ex) {

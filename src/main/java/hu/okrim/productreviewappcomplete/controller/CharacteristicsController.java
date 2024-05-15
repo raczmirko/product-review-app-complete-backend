@@ -39,14 +39,14 @@ public class CharacteristicsController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Characteristic> getCharacteristic(@PathVariable ("id") Long id) {
-        Characteristic characteristic = characteristicService.findCharacteristicById(id);
+        Characteristic characteristic = characteristicService.findById(id);
         return new ResponseEntity<>(characteristic, HttpStatus.OK);
     }
 
     @PostMapping("/{id}/delete")
     public ResponseEntity<?> deleteCharacteristic(@PathVariable("id") Long id){
         try {
-            characteristicService.deleteCharacteristicById(id);
+            characteristicService.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception ex) {
             String errorMessage = SqlExceptionMessageHandler.characteristicDeleteErrorMessage(ex);
@@ -58,7 +58,7 @@ public class CharacteristicsController {
     public ResponseEntity<?> deleteCharacteristics(@PathVariable("ids") Long[] ids){
         for(Long id : ids) {
             try {
-                characteristicService.deleteCharacteristicById(id);
+                characteristicService.deleteById(id);
             } catch (Exception ex) {
                 String errorMessage = SqlExceptionMessageHandler.characteristicDeleteErrorMessage(ex);
                 return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
@@ -70,7 +70,7 @@ public class CharacteristicsController {
     @PostMapping("/{id}/cascade-delete")
     public ResponseEntity<?> cascadeDeleteCharacteristic(@PathVariable("id") Long id){
         try {
-            Characteristic foundCharacteristic = characteristicService.findCharacteristicById(id);
+            Characteristic foundCharacteristic = characteristicService.findById(id);
             Set<Category> categories = foundCharacteristic.getCategories();
 
             // Remove the characteristic from all categories
@@ -79,7 +79,7 @@ public class CharacteristicsController {
             }
 
             // Delete the characteristic
-            characteristicService.deleteCharacteristicById(id);
+            characteristicService.deleteById(id);
 
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception ex) {
@@ -90,7 +90,7 @@ public class CharacteristicsController {
 
     @PutMapping("/{id}/modify")
     public ResponseEntity<?> modifyCharacteristic(@PathVariable("id") Long id, @RequestBody CharacteristicDTO characteristicDTO){
-        Characteristic existingCharacteristic = characteristicService.findCharacteristicById(id);
+        Characteristic existingCharacteristic = characteristicService.findById(id);
 
         if (existingCharacteristic == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -100,7 +100,7 @@ public class CharacteristicsController {
             existingCharacteristic.setUnitOfMeasureName(characteristicDTO.getUnitOfMeasureName());
             existingCharacteristic.setUnitOfMeasure(characteristicDTO.getUnitOfMeasure());
             existingCharacteristic.setDescription(characteristicDTO.getDescription());
-            characteristicService.saveCharacteristic(existingCharacteristic);
+            characteristicService.save(existingCharacteristic);
         }
         catch (Exception ex) {
             String errorMessage = SqlExceptionMessageHandler.characteristicCreateErrorMessage(ex);
@@ -113,7 +113,7 @@ public class CharacteristicsController {
     public ResponseEntity<?> createCharacteristic(@RequestBody CharacteristicDTO characteristicDTO){
         Characteristic characteristic = CharacteristicMapper.mapToCharacteristic(characteristicDTO);
         try {
-            characteristicService.saveCharacteristic(characteristic);
+            characteristicService.save(characteristic);
             return new ResponseEntity<>(HttpStatus.OK);
         }
         catch (Exception ex) {
@@ -158,7 +158,7 @@ public class CharacteristicsController {
 
     @GetMapping("/{id}/list-characteristic-category-trees")
     public ResponseEntity<?> listCharacteristicCategories (@PathVariable("id") Long id) {
-        Characteristic characteristic = characteristicService.findCharacteristicById(id);
+        Characteristic characteristic = characteristicService.findById(id);
         Set<Category> assignedCategories = characteristic.getCategories();
         List<CategoryHierarchyDTO> assignedCategoryHierarchy = new ArrayList<>();
         // Create the categoryHierarchy of each assigned category
@@ -185,7 +185,7 @@ public class CharacteristicsController {
     @GetMapping("/{id}/available-characteristics")
     public ResponseEntity<Set<Characteristic>> getAvailableCharacteristics (@PathVariable("id") Long categoryId) {
         // Find the category by the provided ID
-        Category category = categoryService.findCategoryById(categoryId);
+        Category category = categoryService.findById(categoryId);
         // Find all characteristics
         Set<Characteristic> availableCharacteristics = new HashSet<>(characteristicService.findAll());
         // Find all characteristics that are already assigned to the category or one of its subcategories
@@ -210,7 +210,7 @@ public class CharacteristicsController {
 
     @GetMapping("/{id}/list-inherited-characteristics")
     public ResponseEntity<?> listInheritedCharacteristics (@PathVariable("id") Long categoryId) {
-        Category category = categoryService.findCategoryById(categoryId);
+        Category category = categoryService.findById(categoryId);
         List<Characteristic> inheritedCharacteristics = new ArrayList<>();
         while(category.getParentCategory() != null) {
             category = category.getParentCategory();

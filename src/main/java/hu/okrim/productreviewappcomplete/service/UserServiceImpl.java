@@ -17,30 +17,30 @@ public class UserServiceImpl implements UserService{
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
     @Override
-    public User getUser(Long id) {
+    public User findById(Long id) {
         Optional<User> user = userRepository.findById(id);
         return unwrapUser(user, id);
     }
 
     @Override
-    public User getUser(String username) {
+    public User findById(String username) {
         Optional<User> user = userRepository.findByUsername(username);
         return unwrapUser(user, 404L);
     }
 
     @Override
-    public void saveUser(User user) {
+    public void save(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
     @Override
-    public void deleteUser(Long id) {
+    public void deleteById(Long id) {
         userRepository.deleteById(id);
     }
 
     @Override
-    public List<User> getUsers() {
+    public List<User> findAll() {
         return userRepository.findAll();
     }
 
