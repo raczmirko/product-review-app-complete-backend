@@ -36,6 +36,13 @@ public class CharacteristicsController {
         }
         return new ResponseEntity<>(characteristics, HttpStatus.OK);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Characteristic> getCharacteristic(@PathVariable ("id") Long id) {
+        Characteristic characteristic = characteristicService.findCharacteristicById(id);
+        return new ResponseEntity<>(characteristic, HttpStatus.OK);
+    }
+
     @PostMapping("/{id}/delete")
     public ResponseEntity<?> deleteCharacteristic(@PathVariable("id") Long id){
         try {
