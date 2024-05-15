@@ -131,14 +131,14 @@ public class CharacteristicsController {
                                                         @RequestParam("orderByColumn") String orderByColumn,
                                                         @RequestParam("orderByDirection") String orderByDirection ) {
 
-        CharacteristicSpecificationBuilder<Characteristic> characteristicCharacteristicSpecificationBuilder = new CharacteristicSpecificationBuilder<>();
+        CharacteristicSpecificationBuilder<Characteristic> characteristicSpecificationBuilder = new CharacteristicSpecificationBuilder<>();
         if (searchColumn != null) {
             switch (searchColumn) {
-                case "id" -> characteristicCharacteristicSpecificationBuilder.withId(searchText);
-                case "name" -> characteristicCharacteristicSpecificationBuilder.withName(searchText);
-                case "description" -> characteristicCharacteristicSpecificationBuilder.withDescription(searchText);
-                case "unitOfMeasure" -> characteristicCharacteristicSpecificationBuilder.withUnitOfMeasure(searchText);
-                case "unitOfMeasureName" -> characteristicCharacteristicSpecificationBuilder.withUnitOfMeasureName(searchText);
+                case "id" -> characteristicSpecificationBuilder.withId(searchText);
+                case "name" -> characteristicSpecificationBuilder.withName(searchText);
+                case "description" -> characteristicSpecificationBuilder.withDescription(searchText);
+                case "unitOfMeasure" -> characteristicSpecificationBuilder.withUnitOfMeasure(searchText);
+                case "unitOfMeasureName" -> characteristicSpecificationBuilder.withUnitOfMeasureName(searchText);
                 default -> {
 
                 }
@@ -147,10 +147,10 @@ public class CharacteristicsController {
         else {
             if(quickFilterValues != null && !quickFilterValues.isEmpty()){
                 // When searchColumn is not provided all fields are searched
-                characteristicCharacteristicSpecificationBuilder.withQuickFilterValues(List.of(quickFilterValues.split(",")));
+                characteristicSpecificationBuilder.withQuickFilterValues(List.of(quickFilterValues.split(",")));
             }
         }
-        Specification<Characteristic> specification = characteristicCharacteristicSpecificationBuilder.build();
+        Specification<Characteristic> specification = characteristicSpecificationBuilder.build();
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(orderByDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderByColumn));
         Page<Characteristic> characteristicPage = characteristicService.findAllBySpecification(specification, pageable);
         return new ResponseEntity<>(characteristicPage ,HttpStatus.OK);
