@@ -60,9 +60,7 @@ public class SqlExceptionMessageHandler {
     public static String characteristicCreateErrorMessage(Exception ex) {
         String errorMessage = ex.getMessage();
         if(errorMessage.contains("Modifying characteristics that already describe a category is not allowed.")) {
-            errorMessage = "UPDATE FAILED: Modifying characteristics " +
-                    "that " +
-                    "already describe a category is not allowed.";
+            errorMessage = "UPDATE FAILED: Modifying characteristics that already describe a category is not allowed.";
         }
         return errorMessage;
     }
