@@ -130,4 +130,13 @@ public class CategoryController {
         }
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
+
+    @GetMapping("/available-parent-categories")
+    public ResponseEntity<List<Category>> getAvailableParentCategories() {
+        List<Category> categories = categoryService.findAvailableParentCategories();
+        if (categories.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(categories, HttpStatus.OK);
+    }
 }

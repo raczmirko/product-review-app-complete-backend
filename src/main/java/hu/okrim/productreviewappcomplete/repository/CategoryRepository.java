@@ -16,6 +16,8 @@ import java.util.Optional;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     Page<Category> findAll(Specification<Category> specification, Pageable pageable);
     Optional<List<Category>> findAllByParentCategoryId(Long id);
-    @Query("SELECT c FROM Category c WHERE c NOT IN (SELECT DISTINCT p.parentCategory FROM Category p WHERE p.parentCategory IS NOT NULL)")
+    @Query("SELECT c FROM Category c WHERE c NOT IN (SELECT DISTINCT c2.parentCategory FROM Category c2 WHERE c2.parentCategory IS NOT NULL)")
     List<Category> findLeafCategories();
+    @Query("SELECT c FROM Category c WHERE c NOT IN (SELECT DISTINCT a.category FROM Article a)")
+    List<Category> findAvailableParentCategories();
 }

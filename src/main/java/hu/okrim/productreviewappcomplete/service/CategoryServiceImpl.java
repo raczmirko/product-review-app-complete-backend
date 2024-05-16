@@ -77,4 +77,9 @@ public class CategoryServiceImpl implements CategoryService{
     public List<Category> findLeafCategories() {
         return categoryRepository.findLeafCategories();
     }
+
+    @Override
+    public List<Category> findAvailableParentCategories() {
+        return categoryRepository.findAvailableParentCategories();
+    }
 }
