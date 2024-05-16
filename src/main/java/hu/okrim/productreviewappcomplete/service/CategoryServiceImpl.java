@@ -72,4 +72,9 @@ public class CategoryServiceImpl implements CategoryService{
     public Page<Category> findAllBySpecification(Specification<Category> specification, Pageable pageable) {
         return categoryRepository.findAll(specification, pageable);
     }
+
+    @Override
+    public List<Category> findLeafCategories() {
+        return categoryRepository.findLeafCategories();
+    }
 }

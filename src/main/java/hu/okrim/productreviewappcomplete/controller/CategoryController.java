@@ -121,4 +121,13 @@ public class CategoryController {
         Page<Category> categoryPage = categoryService.findAllBySpecification(specification, pageable);
         return new ResponseEntity<>(categoryPage, HttpStatus.OK);
     }
+
+    @GetMapping("/leaf-categories")
+    public ResponseEntity<List<Category>> getLeafCategories() {
+        List<Category> categories = categoryService.findLeafCategories();
+        if (categories.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(categories, HttpStatus.OK);
+    }
 }

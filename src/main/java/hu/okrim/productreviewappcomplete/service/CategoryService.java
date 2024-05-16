@@ -15,4 +15,5 @@ public interface CategoryService {
     void save(Category category);
     List<Category> findAll();
     Page<Category> findAllBySpecification(Specification<Category> specification, Pageable pageable);
+    List<Category> findLeafCategories();
 }
