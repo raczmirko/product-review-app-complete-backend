@@ -1,16 +1,10 @@
 package hu.okrim.productreviewappcomplete.controller;
 
 import hu.okrim.productreviewappcomplete.dto.ArticleDTO;
-import hu.okrim.productreviewappcomplete.dto.CharacteristicDTO;
 import hu.okrim.productreviewappcomplete.mapper.ArticleMapper;
-import hu.okrim.productreviewappcomplete.mapper.CharacteristicMapper;
 import hu.okrim.productreviewappcomplete.model.Article;
-import hu.okrim.productreviewappcomplete.model.Characteristic;
-import hu.okrim.productreviewappcomplete.repository.ArticleRepository;
 import hu.okrim.productreviewappcomplete.service.ArticleService;
 import hu.okrim.productreviewappcomplete.specification.ArticleSpecificationBuilder;
-import hu.okrim.productreviewappcomplete.specification.CharacteristicSpecificationBuilder;
-import hu.okrim.productreviewappcomplete.util.SqlExceptionMessageHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
