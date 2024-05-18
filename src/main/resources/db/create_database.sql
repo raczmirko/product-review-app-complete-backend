@@ -91,6 +91,7 @@ CREATE TABLE article (
 
 CREATE TABLE packaging (
 	id int IDENTITY(1,1),
+	name varchar(100) NOT NULL,
 	amount smallint NOT NULL,
 	unit_of_measure varchar(100),
 	unit_of_measure_name varchar(100),
