@@ -69,7 +69,7 @@ public class CountryController {
         }
     }
 
-    @PutMapping("/{id}/modify")
+    @PutMapping("/{countryCode}/modify")
     public ResponseEntity<HttpStatus> modifyCountry(@PathVariable("countryCode") String countryCode, @RequestBody CountryDTO countryDTO){
         Country existingCountry = countryService.findByCountryCode(countryDTO.getCountryCode());
 

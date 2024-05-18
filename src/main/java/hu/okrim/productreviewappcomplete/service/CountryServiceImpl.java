@@ -19,7 +19,7 @@ public class CountryServiceImpl implements CountryService{
     CountryRepository countryRepository;
     @Override
     public Country findByCountryCode(String countryCode) {
-        return null;
+        return countryRepository.findByCountryCode(countryCode);
     }
 
     @Override
