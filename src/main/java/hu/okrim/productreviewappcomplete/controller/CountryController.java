@@ -107,7 +107,7 @@ public class CountryController {
             }
         }
         Specification<Country> specification = countryCountrySpecificationBuilder.build();
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(orderByDirection.equals("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC, orderByColumn));
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(orderByDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderByColumn));
         Page<Country> countriesPage = countryService.findAllBySpecification(specification, pageable);
         return new ResponseEntity<>(countriesPage, HttpStatus.OK);
     }
