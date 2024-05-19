@@ -72,7 +72,7 @@ public class PackagingController {
             existingPackaging.setAmount(packagingDTO.getAmount());
             existingPackaging.setSize(packagingDTO.getSize());
             existingPackaging.setUnitOfMeasure(packagingDTO.getUnitOfMeasure());
-            existingPackaging.setUnitOfMeasure(packagingDTO.getUnitOfMeasure());
+            existingPackaging.setUnitOfMeasureName(packagingDTO.getUnitOfMeasureName());
             packagingService.save(existingPackaging);
         }
         catch (Exception ex) {
