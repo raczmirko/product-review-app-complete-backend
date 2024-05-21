@@ -27,8 +27,6 @@ public class ProductImageController {
                                                 @RequestParam MultipartFile[] files) {
         Optional<Product> productOptional = productRepository.findById(productId);
 
-        System.out.println(Arrays.toString(files));
-
         if (productOptional.isPresent() && files != null && files.length != 0) {
             try {
                 Product product = productOptional.get();
