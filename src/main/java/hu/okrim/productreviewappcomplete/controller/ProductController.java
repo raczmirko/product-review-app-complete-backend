@@ -81,7 +81,7 @@ public class ProductController {
         Product product = ProductMapper.mapToProduct(productDTO);
         try {
             productService.save(product);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(product.getId(), HttpStatus.OK);
         }
         catch (Exception ex) {
             String message = ex.getMessage();
