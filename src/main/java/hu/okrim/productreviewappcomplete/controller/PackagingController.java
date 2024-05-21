@@ -3,7 +3,9 @@ package hu.okrim.productreviewappcomplete.controller;
 import hu.okrim.productreviewappcomplete.dto.PackagingDTO;
 import hu.okrim.productreviewappcomplete.mapper.PackagingMapper;
 import hu.okrim.productreviewappcomplete.model.Packaging;
+import hu.okrim.productreviewappcomplete.model.Product;
 import hu.okrim.productreviewappcomplete.service.PackagingService;
+import hu.okrim.productreviewappcomplete.service.ProductService;
 import hu.okrim.productreviewappcomplete.specification.PackagingSpecificationBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +24,8 @@ import java.util.List;
 public class PackagingController {
     @Autowired
     PackagingService packagingService;
+    @Autowired
+    ProductService productService;
 
     @GetMapping("/all")
     public ResponseEntity<List<Packaging>> getPackagings() {
@@ -129,5 +133,19 @@ public class PackagingController {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(orderByDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderByColumn));
         Page<Packaging> packagingPage = packagingService.findAllBySpecification(specification, pageable);
         return new ResponseEntity<>(packagingPage ,HttpStatus.OK);
+    }
+
+    // Get all packagings options that are not yet assigned to an article (in form of a product)
+    @GetMapping("{articleId}/available-options")
+    public ResponseEntity<List<Packaging>> getAvailablePackagings(@PathVariable("articleId") Long articleId) {
+        List<Packaging> allPackagings = packagingService.findAll();
+        List<Product> productsOfArticle = productService.findProductsByArticleId(articleId);
+        for(Product p : productsOfArticle) {
+            allPackagings.remove(p.getPackaging());
+        }
+        if (allPackagings.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(allPackagings, HttpStatus.OK);
     }
 }
