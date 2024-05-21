@@ -110,7 +110,8 @@ CREATE TABLE product (
 	packaging int NOT NULL,
 	CONSTRAINT pk_product PRIMARY KEY (id),
 	CONSTRAINT fk_product_article FOREIGN KEY (article) REFERENCES article(id),
-	CONSTRAINT fk_product_packaging FOREIGN KEY (packaging) REFERENCES packaging(id)
+	CONSTRAINT fk_product_packaging FOREIGN KEY (packaging) REFERENCES packaging(id),
+	CONSTRAINT uq_product UNIQUE (article, packaging)
 );
 
 CREATE TABLE product_characteristic_value (
