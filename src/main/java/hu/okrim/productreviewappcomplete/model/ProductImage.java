@@ -25,5 +25,10 @@ public class ProductImage {
     @Lob
     @Column(name = "image", columnDefinition = "varbinary(max)")
     private byte[] image;
+
+    public ProductImage(Product product, byte[] image){
+        this.product = product;
+        this.image = image;
+    }
 }
 
