@@ -41,4 +41,9 @@ public class ProductServiceImpl implements ProductService{
     public Page<Product> findAllBySpecification(Specification<Product> specification, Pageable pageable) {
         return productRepository.findAll(specification, pageable);
     }
+
+    @Override
+    public List<Product> findProductsByArticleId(Long articleId) {
+        return productRepository.findByArticleId(articleId);
+    }
 }

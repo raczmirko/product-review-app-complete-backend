@@ -13,4 +13,5 @@ public interface ProductService {
     void save (Product product);
     List<Product> findAll();
     Page<Product> findAllBySpecification(Specification<Product> specification, Pageable pageable);
+    List<Product> findProductsByArticleId(Long articleId);
 }
