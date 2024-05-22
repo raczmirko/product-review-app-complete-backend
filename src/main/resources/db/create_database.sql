@@ -115,10 +115,11 @@ CREATE TABLE product (
 );
 
 CREATE TABLE product_characteristic_value (
+    id int IDENTITY(1,1),
 	product int,
 	characteristic int,
 	[value] varchar(100) NOT NULL,
-	CONSTRAINT pk_product_characteristic_value PRIMARY KEY (product, characteristic),
+	CONSTRAINT pk_product_characteristic_value PRIMARY KEY (id),
 	CONSTRAINT fk_product_characteristic_value_article FOREIGN KEY (product) REFERENCES product(id),
 );
 

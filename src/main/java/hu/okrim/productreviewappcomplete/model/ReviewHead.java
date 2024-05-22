@@ -1,6 +1,5 @@
 package hu.okrim.productreviewappcomplete.model;
 
-import hu.okrim.productreviewappcomplete.model.compositeKey.ProductCharacteristicValueId;
 import hu.okrim.productreviewappcomplete.model.compositeKey.ReviewHeadId;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

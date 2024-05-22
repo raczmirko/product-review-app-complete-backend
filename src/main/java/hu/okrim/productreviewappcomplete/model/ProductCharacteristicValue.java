@@ -1,6 +1,5 @@
 package hu.okrim.productreviewappcomplete.model;
 
-import hu.okrim.productreviewappcomplete.model.compositeKey.ProductCharacteristicValueId;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,17 +14,16 @@ import lombok.Setter;
 @Table(name = "product_characteristic_value")
 public class ProductCharacteristicValue {
 
-    @EmbeddedId
-    private ProductCharacteristicValueId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
-    @MapsId("productId")
-    @JoinColumn(name = "product")
+    @JoinColumn(name = "product", nullable = false)
     private Product product;
 
     @ManyToOne
-    @MapsId("characteristicId")
-    @JoinColumn(name = "characteristic")
+    @JoinColumn(name = "characteristic", nullable = false)
     private Characteristic characteristic;
 
     @Column(name = "value", nullable = false, length = 100)
