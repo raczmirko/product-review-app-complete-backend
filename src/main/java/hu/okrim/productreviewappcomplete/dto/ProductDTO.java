@@ -2,6 +2,7 @@ package hu.okrim.productreviewappcomplete.dto;
 
 import hu.okrim.productreviewappcomplete.model.Article;
 import hu.okrim.productreviewappcomplete.model.Packaging;
+import hu.okrim.productreviewappcomplete.model.ProductCharacteristicValue;
 import hu.okrim.productreviewappcomplete.model.ProductImage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,4 +20,5 @@ public class ProductDTO {
     private Article article;
     private Packaging packaging;
     private List<ProductImage> productImages;
+    private List<ProductCharacteristicValue> productCharacteristicValues;
 }

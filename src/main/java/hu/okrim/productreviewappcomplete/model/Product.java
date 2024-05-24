@@ -26,4 +26,6 @@ public class Product {
     private Packaging packaging;
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> productImages;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductCharacteristicValue> productCharacteristicValues;
 }

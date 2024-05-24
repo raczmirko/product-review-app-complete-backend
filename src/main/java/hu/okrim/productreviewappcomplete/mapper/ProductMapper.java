@@ -9,7 +9,8 @@ public class ProductMapper {
             product.getId(),
             product.getArticle(),
             product.getPackaging(),
-            product.getProductImages()
+            product.getProductImages(),
+            product.getProductCharacteristicValues()
         );
     }
 
@@ -18,7 +19,8 @@ public class ProductMapper {
             productDTO.getId() != null ? productDTO.getId() : null,
             productDTO.getArticle(),
             productDTO.getPackaging(),
-            productDTO.getProductImages()
+            productDTO.getProductImages(),
+            productDTO.getProductCharacteristicValues()
         );
     }
 }
