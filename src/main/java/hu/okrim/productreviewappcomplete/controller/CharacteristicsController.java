@@ -198,7 +198,6 @@ public class CharacteristicsController {
     public Set<Characteristic> getCharacteristicsOfCategoryTree(Category category) {
         // Create a list with the category and all subcategories
         ArrayList<Category> categories = new ArrayList<>(categoryService.findAllCategoriesInHierarchy(category));
-        categories.add(category);
         // Create a set that stores the result characteristics
         Set<Characteristic> resultSet = new HashSet<>();
         // Iterate through the categories and add all of their characteristics to the result set
