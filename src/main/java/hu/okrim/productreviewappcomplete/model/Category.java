@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Set;
 @Setter
 @Getter
@@ -32,6 +33,8 @@ public class Category {
             inverseJoinColumns = @JoinColumn(name = "characteristic")
     )
     private Set<Characteristic> characteristics;
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Aspect> reviewAspects;
 
     public Category(Long id, String name, Category parentCategory, String description) {
         this.name = name;
