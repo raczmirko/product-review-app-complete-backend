@@ -4,11 +4,9 @@ import hu.okrim.productreviewappcomplete.dto.AspectDTO;
 import hu.okrim.productreviewappcomplete.mapper.AspectMapper;
 import hu.okrim.productreviewappcomplete.model.Aspect;
 import hu.okrim.productreviewappcomplete.model.Category;
-import hu.okrim.productreviewappcomplete.model.Characteristic;
 import hu.okrim.productreviewappcomplete.service.AspectService;
 import hu.okrim.productreviewappcomplete.service.CategoryService;
 import hu.okrim.productreviewappcomplete.specification.AspectSpecificationBuilder;
-import hu.okrim.productreviewappcomplete.util.SqlExceptionMessageHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -98,13 +96,13 @@ public class AspectController {
                                                     @RequestParam("orderByColumn") String orderByColumn,
                                                     @RequestParam("orderByDirection") String orderByDirection
     ) {
-        AspectSpecificationBuilder<Aspect> brandAspectSpecificationBuilder = new AspectSpecificationBuilder<>();
+        AspectSpecificationBuilder<Aspect> aspectSpecificationBuilder = new AspectSpecificationBuilder<>();
         if (searchColumn != null) {
             switch (searchColumn) {
-                case "id" -> brandAspectSpecificationBuilder.withId(searchText);
-                case "name" -> brandAspectSpecificationBuilder.withName(searchText);
-                case "question" -> brandAspectSpecificationBuilder.withQuestion(searchText);
-                case "category" -> brandAspectSpecificationBuilder.withCategoryName(searchText);
+                case "id" -> aspectSpecificationBuilder.withId(searchText);
+                case "name" -> aspectSpecificationBuilder.withName(searchText);
+                case "question" -> aspectSpecificationBuilder.withQuestion(searchText);
+                case "category" -> aspectSpecificationBuilder.withCategoryName(searchText);
                 default -> {
 
                 }
@@ -113,10 +111,10 @@ public class AspectController {
         else {
             if(quickFilterValues != null && !quickFilterValues.isEmpty()){
                 // When searchColumn is not provided all fields are searched
-                brandAspectSpecificationBuilder.withQuickFilterValues(List.of(quickFilterValues.split(",")));
+                aspectSpecificationBuilder.withQuickFilterValues(List.of(quickFilterValues.split(",")));
             }
         }
-        Specification<Aspect> specification = brandAspectSpecificationBuilder.build();
+        Specification<Aspect> specification = aspectSpecificationBuilder.build();
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(orderByDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderByColumn));
         Page<Aspect> aspectsPage = aspectService.findAllBySpecification(specification, pageable);
         return new ResponseEntity<>(aspectsPage, HttpStatus.OK);
