@@ -3,7 +3,10 @@ package hu.okrim.productreviewappcomplete.controller;
 import hu.okrim.productreviewappcomplete.dto.AspectDTO;
 import hu.okrim.productreviewappcomplete.mapper.AspectMapper;
 import hu.okrim.productreviewappcomplete.model.Aspect;
+import hu.okrim.productreviewappcomplete.model.Category;
+import hu.okrim.productreviewappcomplete.model.Characteristic;
 import hu.okrim.productreviewappcomplete.service.AspectService;
+import hu.okrim.productreviewappcomplete.service.CategoryService;
 import hu.okrim.productreviewappcomplete.specification.AspectSpecificationBuilder;
 import hu.okrim.productreviewappcomplete.util.SqlExceptionMessageHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +19,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/aspect")
 public class AspectController {
     @Autowired
     AspectService aspectService;
+    @Autowired
+    CategoryService categoryService;
 
     @GetMapping("/all")
     public ResponseEntity<List<Aspect>> getAspects() {
@@ -112,5 +120,30 @@ public class AspectController {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(orderByDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderByColumn));
         Page<Aspect> aspectsPage = aspectService.findAllBySpecification(specification, pageable);
         return new ResponseEntity<>(aspectsPage, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/available-aspects")
+    public ResponseEntity<Set<Aspect>> getAvailableAspects (@PathVariable("id") Long categoryId) {
+        // Find the category by the provided ID
+        Category category = categoryService.findById(categoryId);
+        // Find all aspects
+        Set<Aspect> availableAspects = new HashSet<>(aspectService.findAll());
+        // Find all aspects that are already assigned in the category tree
+        Set<Aspect> alreadyAssignedAspects = new HashSet<>(getAspectsOfCategoryTree(category));
+        // Remove already assigned aspects from available ones
+        availableAspects.removeAll(alreadyAssignedAspects);
+        return new ResponseEntity<>(availableAspects, HttpStatus.OK);
+    }
+
+    public Set<Aspect> getAspectsOfCategoryTree(Category category) {
+        // Create a list with all categories in hierarchy
+        ArrayList<Category> categories = new ArrayList<>(categoryService.findAllCategoriesInHierarchy(category));
+        // Create a set that stores the result aspects
+        Set<Aspect> resultSet = new HashSet<>();
+        // Iterate through the categories and add all of their aspects to the result set
+        for (Category c : categories) {
+            resultSet.addAll(c.getReviewAspects());
+        }
+        return resultSet;
     }
 }
