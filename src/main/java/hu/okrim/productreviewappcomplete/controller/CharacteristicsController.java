@@ -217,4 +217,15 @@ public class CharacteristicsController {
         }
         return new ResponseEntity<>(inheritedCharacteristics, HttpStatus.OK);
     }
+
+    @GetMapping("/{id}/list-assigned-characteristics")
+    public ResponseEntity<?> listAssignedCharacteristics (@PathVariable("id") Long categoryId) {
+        Category category = categoryService.findById(categoryId);
+        List<Characteristic> inheritedCharacteristics = new ArrayList<>();
+        do {
+            inheritedCharacteristics.addAll(category.getCharacteristics());
+            category = category.getParentCategory();
+        } while (category != null);
+        return new ResponseEntity<>(inheritedCharacteristics, HttpStatus.OK);
+    }
 }
