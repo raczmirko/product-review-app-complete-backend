@@ -7,6 +7,7 @@ import hu.okrim.productreviewappcomplete.model.Category;
 import hu.okrim.productreviewappcomplete.service.AspectService;
 import hu.okrim.productreviewappcomplete.service.CategoryService;
 import hu.okrim.productreviewappcomplete.specification.AspectSpecificationBuilder;
+import hu.okrim.productreviewappcomplete.util.SqlExceptionMessageHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -65,7 +66,7 @@ public class AspectController {
     }
 
     @PutMapping("/{id}/modify")
-    public ResponseEntity<HttpStatus> modifyAspect(@PathVariable("id") Long id, @RequestBody AspectDTO aspectDTO){
+    public ResponseEntity<?> modifyAspect(@PathVariable("id") Long id, @RequestBody AspectDTO aspectDTO){
         Aspect existingAspect = aspectService.findById(id);
 
         if (existingAspect == null) {
@@ -76,9 +77,15 @@ public class AspectController {
         existingAspect.setQuestion(aspectDTO.getQuestion());
         existingAspect.setCategory(aspectDTO.getCategory());
 
-        aspectService.save(existingAspect);
+        try {
+            aspectService.save(existingAspect);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        catch (Exception ex) {
+            String errorMessage = SqlExceptionMessageHandler.aspectUpdateErrorMessage(ex);
+            return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
+        }
 
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/create")

@@ -72,4 +72,12 @@ public class SqlExceptionMessageHandler {
         }
         return errorMessage;
     }
+
+    public static String aspectUpdateErrorMessage (Exception ex){
+        String errorMessage = ex.getMessage();
+        if (errorMessage.contains("Aspect already assigned")) {
+            errorMessage = "UPDATE FAILED: Aspect with identical name already assigned to a category in the category hierarchy, which is not allowed.";
+        }
+        return errorMessage;
+    }
 }
