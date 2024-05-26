@@ -114,7 +114,7 @@ public class CharacteristicsController {
         Characteristic characteristic = CharacteristicMapper.mapToCharacteristic(characteristicDTO);
         try {
             characteristicService.save(characteristic);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.CREATED);
         }
         catch (Exception ex) {
             String message = SqlExceptionMessageHandler.characteristicCreateErrorMessage(ex);

@@ -89,7 +89,7 @@ public class ArticleController {
         Article article = ArticleMapper.mapToArticle(articleDTO);
         try {
             articleService.save(article);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.CREATED);
         }
         catch (Exception ex) {
             String message = ex.getMessage();

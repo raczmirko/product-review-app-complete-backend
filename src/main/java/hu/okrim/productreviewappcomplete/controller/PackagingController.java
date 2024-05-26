@@ -91,7 +91,7 @@ public class PackagingController {
         Packaging packaging = PackagingMapper.mapToPackaging(packagingDTO);
         try {
             packagingService.save(packaging);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.CREATED);
         }
         catch (Exception ex) {
             String message = ex.getMessage();

@@ -35,7 +35,7 @@ public class ProductImageController {
                     byte[] imageBytes = file.getBytes();
                     productImageRepository.save(new ProductImage(product, imageBytes));
                 }
-                return new ResponseEntity<>(HttpStatus.OK);
+                return new ResponseEntity<>(HttpStatus.CREATED);
             } catch (Exception ex) {
                 String message = "Failed to upload images: " + ex.getMessage();
                 return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);

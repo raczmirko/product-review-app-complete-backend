@@ -78,7 +78,7 @@ public class BrandController {
     @PostMapping("/create")
     public ResponseEntity<HttpStatus> createBrand(@RequestBody BrandDTO brandDTO){
         brandService.save(BrandMapper.mapToBrand(brandDTO));
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/search")

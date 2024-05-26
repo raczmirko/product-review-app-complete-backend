@@ -81,7 +81,7 @@ public class CategoryController {
         if(categoryDTO.getParentCategory() != null) category.setParentCategory(categoryDTO.getParentCategory());
         try {
             categoryService.save(category);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.CREATED);
         }
         catch (Exception ex) {
             String message = SqlExceptionMessageHandler.categoryCreateErrorMessage(ex);

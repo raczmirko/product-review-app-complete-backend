@@ -22,7 +22,7 @@ public class ProductCharacteristicValueController {
         ProductCharacteristicValue pcv = ProductCharacteristicValueMapper.mapToProductCharacteristicValue(pcvDTO);
         try {
             pcvService.save(pcv);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.CREATED);
         }
         catch (Exception ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
