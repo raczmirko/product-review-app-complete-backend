@@ -82,9 +82,15 @@ public class AspectController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<HttpStatus> createAspect(@RequestBody AspectDTO aspectDTO){
-        aspectService.save(AspectMapper.mapToAspect(aspectDTO));
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<?> createAspect(@RequestBody AspectDTO aspectDTO){
+        if(aspectNameNotPresentInHierarchy(aspectDTO.getName(), aspectDTO.getCategory())) {
+            aspectService.save(AspectMapper.mapToAspect(aspectDTO));
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        }
+        else {
+            String errorMessage = "ERROR: An aspect with the same name is already defined in the category hierarchy.";
+            return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
+        }
     }
 
     @GetMapping("/search")
@@ -137,11 +143,17 @@ public class AspectController {
         // Create a list with all categories in hierarchy
         ArrayList<Category> categories = new ArrayList<>(categoryService.findAllCategoriesInHierarchy(category));
         // Create a set that stores the result aspects
-        Set<Aspect> resultSet = new HashSet<>();
+        Set<Aspect> aspects = new HashSet<>();
         // Iterate through the categories and add all of their aspects to the result set
         for (Category c : categories) {
-            resultSet.addAll(c.getReviewAspects());
+            aspects.addAll(aspectService.findByCategory(c));
         }
-        return resultSet;
+        return aspects;
+    }
+
+    private boolean aspectNameNotPresentInHierarchy(String aspectName, Category category) {
+        Set<Aspect> aspectsOfHierarchy = getAspectsOfCategoryTree(category);
+        return aspectsOfHierarchy.stream()
+            .noneMatch(aspect -> aspect.getName().equalsIgnoreCase(aspectName));
     }
 }

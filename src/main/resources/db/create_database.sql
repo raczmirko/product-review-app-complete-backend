@@ -898,45 +898,6 @@ END;
 
 GO
 
-CREATE OR ALTER TRIGGER trg_check_aspect_already_inherited
-ON aspect
-INSTEAD OF INSERT
-AS
-BEGIN
-    SET NOCOUNT ON;
-	DECLARE @already_inherited bit = 0;
-	DECLARE @inserted_name varchar(100) = (SELECT [name] from inserted);
-	DECLARE @inserted_category int = (SELECT category FROM inserted);
-
-	BEGIN
-		WITH hierarchy_aspect AS (
-			SELECT [name]
-			FROM aspect
-			WHERE category IN (SELECT id FROM dbo.get_category_hierarchy(@inserted_category))
-		),
-		name_is_present AS (
-			SELECT
-			CASE
-				WHEN LOWER(@inserted_name) IN (SELECT LOWER([name]) FROM hierarchy_aspect) THEN 1
-				ELSE 0
-			END AS already_present
-		)
-		SELECT @already_inherited = already_present
-		FROM name_is_present
-
-		IF @already_inherited = 1
-		BEGIN
-			;THROW 51000, 'An aspect with the same name is already assigned to a category in the category hierarchy.', 1;
-		END
-		ELSE
-			INSERT INTO aspect ([name],	 question, category)
-			SELECT [name], question, category
-			FROM inserted;
-	END
-END;
-
-GO
-
 CREATE OR ALTER TRIGGER trg_check_aspect_update
 ON aspect
 INSTEAD OF UPDATE
