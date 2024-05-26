@@ -10,8 +10,7 @@ public class CategoryMapper {
                 category.getName(),
                 category.getParentCategory(),
                 category.getDescription(),
-                category.getCharacteristics(),
-                category.getReviewAspects()
+                category.getCharacteristics()
         );
     }
     public static Category mapToCategory (CategoryDTO categoryDTO){

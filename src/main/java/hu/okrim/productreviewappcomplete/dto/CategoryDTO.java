@@ -1,6 +1,5 @@
 package hu.okrim.productreviewappcomplete.dto;
 
-import hu.okrim.productreviewappcomplete.model.Aspect;
 import hu.okrim.productreviewappcomplete.model.Category;
 import hu.okrim.productreviewappcomplete.model.Characteristic;
 import lombok.AllArgsConstructor;
@@ -8,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.Set;
 
 @Setter
@@ -21,5 +19,4 @@ public class CategoryDTO {
     private Category parentCategory;
     private String description;
     private Set<Characteristic> characteristics;
-    private List<Aspect> reviewAspects;
 }
