@@ -48,6 +48,14 @@ public class SqlExceptionMessageHandler {
         return errorMessage;
     }
 
+    public static String categoryUpdateErrorMessage (Exception ex){
+        String errorMessage = ex.getMessage();
+        if (errorMessage.contains("characteristics are already assigned")) {
+            errorMessage = "UPDATE FAILED: Changing this category is not allowed because characteristics are already assigned to it or it's subcategories, and updating would re-define the inheritance hierarchy.";
+        }
+        return errorMessage;
+    }
+
     public static String characteristicDeleteErrorMessage(Exception ex) {
         String errorMessage = ex.getMessage();
         if(errorMessage.contains("fk_category_x_characteristic_characteristic")) {

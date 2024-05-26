@@ -62,7 +62,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}/modify")
-    public ResponseEntity<HttpStatus> modifyCategory(@PathVariable("id") Long id, @RequestBody CategoryDTO categoryDTO){
+    public ResponseEntity<?> modifyCategory(@PathVariable("id") Long id, @RequestBody CategoryDTO categoryDTO){
         Category existingCategory = categoryService.findById(id);
         if (existingCategory == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -71,8 +71,14 @@ public class CategoryController {
         existingCategory.setDescription(categoryDTO.getDescription());
         existingCategory.setParentCategory(categoryDTO.getParentCategory());
         existingCategory.setCharacteristics(categoryDTO.getCharacteristics());
-        categoryService.save(existingCategory);
-        return new ResponseEntity<>(HttpStatus.OK);
+        try{
+            categoryService.save(existingCategory);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        catch (Exception ex) {
+            String message = SqlExceptionMessageHandler.categoryUpdateErrorMessage(ex);
+            return new ResponseEntity<>(message, HttpStatus.CONFLICT);
+        }
     }
 
     @PostMapping("/create")
