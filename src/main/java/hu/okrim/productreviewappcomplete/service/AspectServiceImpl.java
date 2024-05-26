@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class AspectServiceImpl implements AspectService{
     @Override
     public Aspect findById(Long id) {
         return aspectRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(id, Article.class));
+                .orElseThrow(() -> new EntityNotFoundException(id, Aspect.class));
     }
 
     @Override
