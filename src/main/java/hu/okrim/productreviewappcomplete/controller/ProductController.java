@@ -4,7 +4,13 @@ import hu.okrim.productreviewappcomplete.dto.ProductDTO;
 import hu.okrim.productreviewappcomplete.mapper.ProductMapper;
 import hu.okrim.productreviewappcomplete.model.Product;
 import hu.okrim.productreviewappcomplete.service.ProductService;
+import hu.okrim.productreviewappcomplete.specification.ProductSpecificationBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -87,5 +93,31 @@ public class ProductController {
             String message = ex.getMessage();
             return new ResponseEntity<>(message, HttpStatus.CONFLICT);
         }
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<Product>> searchProducts(@RequestParam(value = "searchText", required = false) String searchText,
+                                                      @RequestParam(value = "searchColumn", required = false) String searchColumn,
+                                                      @RequestParam(value = "quickFilterValues", required = false) String quickFilterValues,
+                                                      @RequestParam("pageSize") Integer pageSize,
+                                                      @RequestParam("pageNumber") Integer pageNumber,
+                                                      @RequestParam("orderByColumn") String orderByColumn,
+                                                      @RequestParam("orderByDirection") String orderByDirection
+    ) {
+        ProductSpecificationBuilder<Product> aspectSpecificationBuilder = new ProductSpecificationBuilder<>();
+        if (searchColumn != null) {
+            switch (searchColumn) {
+                case "id" -> aspectSpecificationBuilder.withId(searchText);
+                case "article" -> aspectSpecificationBuilder.withArticleName(searchText);
+                case "packaging" -> aspectSpecificationBuilder.withPackagingName(searchText);
+                default -> {
+
+                }
+            }
+        }
+        Specification<Product> specification = aspectSpecificationBuilder.build();
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(orderByDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderByColumn));
+        Page<Product> aspectsPage = productService.findAllBySpecification(specification, pageable);
+        return new ResponseEntity<>(aspectsPage, HttpStatus.OK);
     }
 }
