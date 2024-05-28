@@ -1,5 +1,6 @@
 package hu.okrim.productreviewappcomplete.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,6 +21,7 @@ public class ProductImage {
 
     @ManyToOne
     @JoinColumn(name = "product", referencedColumnName = "id")
+    @JsonIgnore
     private Product product;
 
     @Lob
