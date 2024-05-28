@@ -165,10 +165,10 @@ public class AspectController {
     }
 
     @GetMapping("/{id}/category-aspects")
-    public ResponseEntity<List<Aspect>> getAspectsByCategory (@PathVariable("id") Long categoryId) {
+    public ResponseEntity<Set<Aspect>> getAspectsByCategory (@PathVariable("id") Long categoryId) {
         // Find the category by the provided ID
         Category category = categoryService.findById(categoryId);
-        List<Aspect> categoryAspects = aspectService.findByCategory(category);
+        Set<Aspect> categoryAspects = getAspectsOfCategoryTree(category);
         return new ResponseEntity<>(categoryAspects, HttpStatus.OK);
     }
 }
