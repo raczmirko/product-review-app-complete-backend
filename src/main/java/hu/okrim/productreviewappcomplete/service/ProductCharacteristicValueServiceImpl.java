@@ -1,5 +1,7 @@
 package hu.okrim.productreviewappcomplete.service;
 
+import hu.okrim.productreviewappcomplete.model.Characteristic;
+import hu.okrim.productreviewappcomplete.model.Product;
 import hu.okrim.productreviewappcomplete.model.ProductCharacteristicValue;
 import hu.okrim.productreviewappcomplete.repository.ProductCharacteristicValueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,7 @@ public class ProductCharacteristicValueServiceImpl implements ProductCharacteris
     @Autowired
     ProductCharacteristicValueRepository productCharacteristicValueRepository;
     @Override
-    public ProductCharacteristicValue findByProductId(Long id) {
+    public List<ProductCharacteristicValue> findByProductId(Long id) {
         return productCharacteristicValueRepository.findByProductId(id);
     }
 
@@ -42,5 +44,10 @@ public class ProductCharacteristicValueServiceImpl implements ProductCharacteris
     @Override
     public Page<ProductCharacteristicValue> findAllBySpecification(Specification<ProductCharacteristicValue> specification, Pageable pageable) {
         return productCharacteristicValueRepository.findAll(specification, pageable);
+    }
+
+    @Override
+    public ProductCharacteristicValue findByProductAndCharacteristic(Product product, Characteristic characteristic) {
+        return productCharacteristicValueRepository.findByProductAndCharacteristic(product, characteristic);
     }
 }
