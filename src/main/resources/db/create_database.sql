@@ -121,6 +121,7 @@ CREATE TABLE product_characteristic_value (
 	[value] varchar(100) NOT NULL,
 	CONSTRAINT pk_product_characteristic_value PRIMARY KEY (id),
 	CONSTRAINT fk_product_characteristic_value_article FOREIGN KEY (product) REFERENCES product(id),
+	CONSTRAINT uq_product_characteristic_value UNIQUE (product, characteristic)
 );
 
 CREATE TABLE product_image (
