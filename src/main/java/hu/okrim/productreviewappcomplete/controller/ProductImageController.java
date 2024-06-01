@@ -2,8 +2,8 @@ package hu.okrim.productreviewappcomplete.controller;
 
 import hu.okrim.productreviewappcomplete.model.Product;
 import hu.okrim.productreviewappcomplete.model.ProductImage;
-import hu.okrim.productreviewappcomplete.repository.ProductImageRepository;
-import hu.okrim.productreviewappcomplete.repository.ProductRepository;
+import hu.okrim.productreviewappcomplete.service.ProductImageService;
+import hu.okrim.productreviewappcomplete.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -11,29 +11,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/product-image")
 public class ProductImageController {
     @Autowired
-    ProductImageRepository productImageRepository;
+    ProductImageService productImageService;
     @Autowired
-    ProductRepository productRepository;
+    ProductService productService;
 
     @PostMapping(path = "{productId}/upload", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<?> createProductImage(@PathVariable("productId") Long productId,
                                                 @RequestParam MultipartFile[] files) {
-        Optional<Product> productOptional = productRepository.findById(productId);
+        Product product = productService.findById(productId);
 
-        if (productOptional.isPresent() && files != null && files.length != 0) {
+        if (files != null && files.length != 0) {
             try {
-                Product product = productOptional.get();
-
                 for (MultipartFile file : files) {
                     byte[] imageBytes = file.getBytes();
-                    productImageRepository.save(new ProductImage(product, imageBytes));
+                    productImageService.save(new ProductImage(product, imageBytes));
                 }
                 return new ResponseEntity<>(HttpStatus.CREATED);
             } catch (Exception ex) {
@@ -43,6 +38,18 @@ public class ProductImageController {
         } else {
             String message = "Product with ID " + productId + " not found or images are missing.";
             return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("/{id}/delete")
+    public ResponseEntity<?> deleteProductImage(@PathVariable("id") Long id){
+        try {
+            productImageService.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception ex) {
+            //TODO create custom exceptions
+            String errorMessage = ex.getMessage();
+            return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
         }
     }
 }
