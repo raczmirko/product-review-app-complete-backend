@@ -46,6 +46,34 @@ public class ProductSpecificationBuilder<Product> {
         return this;
     }
 
+    public ProductSpecificationBuilder<Product> withQuickFilterValues(List<String> quickFilterValues) {
+        if (quickFilterValues != null && !quickFilterValues.isEmpty()) {
+            List<Specification<Product>> orSpecifications = new ArrayList<>();
+            for (String value : quickFilterValues) {
+                try {
+                    int intValue = Integer.parseInt(value);
+                    orSpecifications.add((root, query, builder) ->
+                            builder.or(
+                                    builder.equal(root.get("id"), intValue)
+                            )
+                    );
+                } catch (NumberFormatException e) {
+                    // The case where the value cannot be converted to an integer
+                    // For example searching for 'OK', thus ID cannot be equal with 'OK'
+                    // Nothing to be done, ID filter is simply ignored
+                }
+                orSpecifications.add((root, query, builder) ->
+                        builder.or(
+                                builder.like(root.join("article").get("name"), "%" + value + "%"),
+                                builder.like(root.join("packaging").get("name"), "%" + value + "%"),
+                                builder.like(root.join("article").get("category").get("name"), "%" + value + "%")
+                        ));
+            }
+            specifications.add(Specification.where(orSpecifications.stream().reduce((a, b) -> a.or(b)).orElse(null)));
+        }
+        return this;
+    }
+
     public Specification<Product> build() {
         if (specifications.isEmpty()) {
             return null; // No criteria specified

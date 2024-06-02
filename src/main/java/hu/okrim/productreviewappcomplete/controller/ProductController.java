@@ -104,18 +104,24 @@ public class ProductController {
                                                       @RequestParam("orderByColumn") String orderByColumn,
                                                       @RequestParam("orderByDirection") String orderByDirection
     ) {
-        ProductSpecificationBuilder<Product> aspectSpecificationBuilder = new ProductSpecificationBuilder<>();
+        ProductSpecificationBuilder<Product> productSpecificationBuilder = new ProductSpecificationBuilder<>();
         if (searchColumn != null) {
             switch (searchColumn) {
-                case "id" -> aspectSpecificationBuilder.withId(searchText);
-                case "article" -> aspectSpecificationBuilder.withArticleName(searchText);
-                case "packaging" -> aspectSpecificationBuilder.withPackagingName(searchText);
+                case "id" -> productSpecificationBuilder.withId(searchText);
+                case "article" -> productSpecificationBuilder.withArticleName(searchText);
+                case "packaging" -> productSpecificationBuilder.withPackagingName(searchText);
                 default -> {
 
                 }
             }
         }
-        Specification<Product> specification = aspectSpecificationBuilder.build();
+        else {
+            if(quickFilterValues != null && !quickFilterValues.isEmpty()){
+                // When searchColumn is not provided all fields are searched
+                productSpecificationBuilder.withQuickFilterValues(List.of(quickFilterValues.split(",")));
+            }
+        }
+        Specification<Product> specification = productSpecificationBuilder.build();
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(orderByDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderByColumn));
         Page<Product> aspectsPage = productService.findAllBySpecification(specification, pageable);
         return new ResponseEntity<>(aspectsPage, HttpStatus.OK);
