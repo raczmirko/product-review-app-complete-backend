@@ -23,7 +23,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User findById(String username) {
+    public User findByUsername(String username) {
         Optional<User> user = userRepository.findByUsername(username);
         return unwrapUser(user, 404L);
     }
