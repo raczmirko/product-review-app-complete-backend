@@ -1,5 +1,6 @@
 package hu.okrim.productreviewappcomplete.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import hu.okrim.productreviewappcomplete.model.compositeKey.ReviewBodyId;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ public class ReviewBody {
     @Column(name = "score", nullable = false)
     private Short score;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "user", referencedColumnName = "user", insertable = false, updatable = false),
