@@ -24,7 +24,7 @@ public class ReviewBody {
     @JsonIgnore
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "user", referencedColumnName = "user", insertable = false, updatable = false),
+            @JoinColumn(name = "[user]", referencedColumnName = "user", insertable = false, updatable = false),
             @JoinColumn(name = "product", referencedColumnName = "product", insertable = false, updatable = false)
     })
     private ReviewHead reviewHead;
