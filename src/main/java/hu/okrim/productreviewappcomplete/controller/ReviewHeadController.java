@@ -5,9 +5,7 @@ import hu.okrim.productreviewappcomplete.model.*;
 import hu.okrim.productreviewappcomplete.model.compositeKey.ReviewHeadId;
 import hu.okrim.productreviewappcomplete.service.ReviewHeadService;
 import hu.okrim.productreviewappcomplete.service.UserService;
-import hu.okrim.productreviewappcomplete.specification.AspectSpecificationBuilder;
 import hu.okrim.productreviewappcomplete.specification.ReviewHeadSpecificationBuilder;
-import hu.okrim.productreviewappcomplete.util.SqlExceptionMessageHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,10 +16,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Clock;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/review-head")
@@ -70,9 +67,13 @@ public class ReviewHeadController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteReviewHead(@RequestParam("user") Long userId, @RequestParam("product") Long productId) {
-        ReviewHeadId id = new ReviewHeadId(userId, productId);
+    @PostMapping("/delete")
+    public ResponseEntity<?> deleteReviewHead(@RequestBody Map<String, String> request) {
+        String username = request.get("username");
+        Long productId = Long.parseLong(request.get("productId"));
+        User user = userService.findByUsername(username);
+
+        ReviewHeadId id = new ReviewHeadId(user.getId(), productId);
         try {
             reviewHeadService.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -82,7 +83,7 @@ public class ReviewHeadController {
         }
     }
 
-//    @DeleteMapping("/multi-delete")
+//    @PostMapping("/multi-delete")
 //    public ResponseEntity<?> deleteReviewHeads(@RequestParam("idKeyPairs") Long[] idKeyPairs) {
 //        try {
 //            for (int i = 0; i < userIds.length; i++) {
