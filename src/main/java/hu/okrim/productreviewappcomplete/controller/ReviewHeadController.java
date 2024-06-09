@@ -3,6 +3,7 @@ package hu.okrim.productreviewappcomplete.controller;
 import hu.okrim.productreviewappcomplete.dto.ReviewHeadDTO;
 import hu.okrim.productreviewappcomplete.model.*;
 import hu.okrim.productreviewappcomplete.model.compositeKey.ReviewHeadId;
+import hu.okrim.productreviewappcomplete.service.ProductService;
 import hu.okrim.productreviewappcomplete.service.ReviewHeadService;
 import hu.okrim.productreviewappcomplete.service.UserService;
 import hu.okrim.productreviewappcomplete.specification.ReviewHeadSpecificationBuilder;
@@ -28,6 +29,8 @@ public class ReviewHeadController {
     private ReviewHeadService reviewHeadService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private ProductService productService;
 
     @GetMapping("/{user}/{product}")
     public ResponseEntity<ReviewHead> findById(@PathVariable("user") Long userId, @PathVariable("product") Long productId) {
@@ -97,22 +100,24 @@ public class ReviewHeadController {
 //        }
 //    }
 
-    @PutMapping("/{user}/{product}/modify")
-    public ResponseEntity<HttpStatus> modifyReviewHead(@PathVariable("user") Long userId, @PathVariable("product") Long productId, @RequestBody ReviewHead reviewHead) {
-        ReviewHeadId id = new ReviewHeadId(userId, productId);
+    @PutMapping("/{username}/{productId}/modify")
+    public ResponseEntity<HttpStatus> modifyReviewHead(@PathVariable("username") String username,
+                                                       @PathVariable("productId") Long productId,
+                                                       @RequestBody ReviewHeadDTO reviewHeadDTO) {
+        User user = userService.findByUsername(username);
+        Product product = productService.findById(productId);
+        ReviewHeadId id = new ReviewHeadId(user.getId(), product.getId());
         ReviewHead existingReviewHead = reviewHeadService.findById(id);
-
         if (existingReviewHead == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         // Update the existing reviewHead with the new data
-        existingReviewHead.setDate(reviewHead.getDate());
-        existingReviewHead.setDescription(reviewHead.getDescription());
-        existingReviewHead.setRecommended(reviewHead.getRecommended());
-        existingReviewHead.setPurchaseCountry(reviewHead.getPurchaseCountry());
-        existingReviewHead.setValueForPrice(reviewHead.getValueForPrice());
-        existingReviewHead.setReviewBodyItems(reviewHead.getReviewBodyItems());
+        existingReviewHead.setDescription(reviewHeadDTO.getDescription());
+        existingReviewHead.setDate(LocalDateTime.now());
+        existingReviewHead.setRecommended(reviewHeadDTO.getRecommended());
+        existingReviewHead.setPurchaseCountry(reviewHeadDTO.getPurchaseCountry());
+        existingReviewHead.setValueForPrice(reviewHeadDTO.getValueForPrice());
 
         reviewHeadService.save(existingReviewHead);
         return new ResponseEntity<>(HttpStatus.OK);
