@@ -8,9 +8,7 @@ import java.util.Objects;
 
 @Embeddable
 public class ReviewHeadId implements Serializable {
-    @Column(name = "[user]", nullable = false)
     private Long userId;
-    @Column(name = "product", nullable = false)
     private Long productId;
 
     public ReviewHeadId() {
