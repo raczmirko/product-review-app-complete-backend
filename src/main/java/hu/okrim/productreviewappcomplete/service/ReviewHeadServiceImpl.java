@@ -1,7 +1,9 @@
 package hu.okrim.productreviewappcomplete.service;
 
 import hu.okrim.productreviewappcomplete.exception.EntityNotFoundException;
+import hu.okrim.productreviewappcomplete.model.Product;
 import hu.okrim.productreviewappcomplete.model.ReviewHead;
+import hu.okrim.productreviewappcomplete.model.User;
 import hu.okrim.productreviewappcomplete.model.compositeKey.ReviewHeadId;
 import hu.okrim.productreviewappcomplete.repository.ReviewHeadRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,12 @@ public class ReviewHeadServiceImpl implements ReviewHeadService{
     public ReviewHead findById(ReviewHeadId id) {
         return reviewHeadRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(id.getProductId(), ReviewHead.class));
+    }
+
+    @Override
+    public ReviewHead findByUserAndProduct(User user, Product product) {
+        return reviewHeadRepository.findByUserAndProduct(user, product)
+                .orElseThrow(() -> new EntityNotFoundException(product.getId(), ReviewHead.class));
     }
 
     @Override

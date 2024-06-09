@@ -1,6 +1,8 @@
 package hu.okrim.productreviewappcomplete.service;
 
+import hu.okrim.productreviewappcomplete.model.Product;
 import hu.okrim.productreviewappcomplete.model.ReviewHead;
+import hu.okrim.productreviewappcomplete.model.User;
 import hu.okrim.productreviewappcomplete.model.compositeKey.ReviewHeadId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +12,7 @@ import java.util.List;
 
 public interface ReviewHeadService {
     ReviewHead findById(ReviewHeadId id);
+    ReviewHead findByUserAndProduct(User user, Product product);
     void deleteById(ReviewHeadId id);
     void save (ReviewHead reviewHead);
     List<ReviewHead> findAll();
