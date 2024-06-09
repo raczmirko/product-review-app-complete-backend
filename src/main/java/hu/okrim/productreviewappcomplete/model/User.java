@@ -20,6 +20,7 @@ public class User {
     private Long id;
     @Column(nullable = false, unique = true, length = 100)
     private String username;
+    @JsonIgnore
     @Column(nullable = false, length = 1000)
     private String password;
     @ManyToOne
