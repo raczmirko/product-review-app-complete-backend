@@ -1,9 +1,12 @@
 package hu.okrim.productreviewappcomplete.controller;
 
+import hu.okrim.productreviewappcomplete.dto.AspectWithValueDTO;
 import hu.okrim.productreviewappcomplete.dto.ReviewHeadDTO;
 import hu.okrim.productreviewappcomplete.model.*;
+import hu.okrim.productreviewappcomplete.model.compositeKey.ReviewBodyId;
 import hu.okrim.productreviewappcomplete.model.compositeKey.ReviewHeadId;
 import hu.okrim.productreviewappcomplete.service.ProductService;
+import hu.okrim.productreviewappcomplete.service.ReviewBodyService;
 import hu.okrim.productreviewappcomplete.service.ReviewHeadService;
 import hu.okrim.productreviewappcomplete.service.UserService;
 import hu.okrim.productreviewappcomplete.specification.ReviewHeadSpecificationBuilder;
@@ -18,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +35,8 @@ public class ReviewHeadController {
     private UserService userService;
     @Autowired
     private ProductService productService;
+    @Autowired
+    private ReviewBodyService reviewBodyService;
 
     @GetMapping("/{user}/{product}")
     public ResponseEntity<ReviewHead> findById(@PathVariable("user") Long userId, @PathVariable("product") Long productId) {
@@ -121,6 +127,33 @@ public class ReviewHeadController {
 
         reviewHeadService.save(existingReviewHead);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/{username}/{productId}/attach-review-body")
+    public ResponseEntity<?> attachReviewBody(@PathVariable("username") String username,
+                                              @PathVariable("productId") Long productId,
+                                              @RequestBody List<AspectWithValueDTO> aspects) {
+        User user = userService.findByUsername(username);
+        Product product = productService.findById(productId);
+        ReviewHeadId headId = new ReviewHeadId(user.getId(), product.getId());
+        ReviewHead reviewHead = reviewHeadService.findById(headId);
+        if (reviewHead == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        List<ReviewBody> reviewBodies = new ArrayList<>();
+        for(AspectWithValueDTO aspect: aspects) {
+            ReviewBodyId bodyId = new ReviewBodyId(user.getId(), product.getId(), aspect.getId());
+            reviewBodies.add(new ReviewBody(bodyId, aspect.getScore(), reviewHead));
+        }
+
+        try {
+            reviewBodyService.saveAll(reviewBodies);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception ex) {
+            String message = ex.getMessage();
+            return new ResponseEntity<>(message, HttpStatus.CONFLICT);
+        }
     }
 
     @GetMapping("/search")
