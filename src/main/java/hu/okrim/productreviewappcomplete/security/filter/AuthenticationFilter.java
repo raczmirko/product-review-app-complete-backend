@@ -3,7 +3,7 @@ package hu.okrim.productreviewappcomplete.security.filter;
 import java.io.IOException;
 import java.util.Date;
 
-import hu.okrim.productreviewappcomplete.model.User;
+import hu.okrim.productreviewappcomplete.dto.UserDTO;
 import hu.okrim.productreviewappcomplete.security.SecurityConstants;
 import hu.okrim.productreviewappcomplete.security.manager.CustomAuthenticationManager;
 import jakarta.servlet.FilterChain;
@@ -33,7 +33,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
         try {
-            User user = new ObjectMapper().readValue(request.getInputStream(), User.class);
+            UserDTO user = new ObjectMapper().readValue(request.getInputStream(), UserDTO.class);
             Authentication authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
             return authenticationManager.authenticate(authentication);
         } catch (IOException e) {
