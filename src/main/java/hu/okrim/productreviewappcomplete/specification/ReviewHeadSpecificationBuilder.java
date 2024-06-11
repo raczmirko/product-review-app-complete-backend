@@ -41,7 +41,7 @@ public class ReviewHeadSpecificationBuilder<ReviewHead> {
     public ReviewHeadSpecificationBuilder<ReviewHead> withUsername(String username) {
         if (username != null && !username.isEmpty()) {
             specifications.add((root, query, builder) -> {
-                Join<ReviewHead, User> userJoin = root.join("[user]");
+                Join<ReviewHead, User> userJoin = root.join("user");
                 return builder.like(userJoin.get("username"), "%" + username + "%");
             });
         }
@@ -111,7 +111,6 @@ public class ReviewHeadSpecificationBuilder<ReviewHead> {
                     int intValue = Integer.parseInt(value);
                     orSpecifications.add((root, query, builder) ->
                             builder.or(
-                                    builder.equal(root.get("id"), intValue),
                                     builder.equal(root.get("valueForPrice"), intValue)
                             )
                     );
@@ -130,7 +129,7 @@ public class ReviewHeadSpecificationBuilder<ReviewHead> {
                 } catch (DateTimeParseException ignored) {}
                 orSpecifications.add((root, query, builder) ->
                         builder.or(
-                                builder.like(root.join("[user]").get("username"), "%" + value + "%"),
+                                builder.like(root.join("user").get("username"), "%" + value + "%"),
                                 builder.like(root.join("product").join("article").get("name"), "%" + value + "%"),
                                 builder.like(root.get("description"), "%" + value + "%"),
                                 builder.equal(root.get("recommended"), Boolean.parseBoolean(value)),
