@@ -203,7 +203,8 @@ public class ReviewHeadController {
             return new ResponseEntity<>(HttpStatus.OK);
         }
         else {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            String errorMessage = "You already have a review for this product.";
+            return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
         }
     }
 }
