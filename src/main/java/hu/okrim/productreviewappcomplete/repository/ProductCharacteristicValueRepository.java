@@ -13,7 +13,7 @@ import java.util.List;
 public interface ProductCharacteristicValueRepository extends JpaRepository<ProductCharacteristicValue, Long> {
     List<ProductCharacteristicValue> findByProductId(Long productId);
 
-    ProductCharacteristicValue findByCharacteristicId(Long characteristicId);
+    List<ProductCharacteristicValue> findByCharacteristicId(Long characteristicId);
 
     Page<ProductCharacteristicValue> findAll(Specification<ProductCharacteristicValue> specification, Pageable pageable);
 

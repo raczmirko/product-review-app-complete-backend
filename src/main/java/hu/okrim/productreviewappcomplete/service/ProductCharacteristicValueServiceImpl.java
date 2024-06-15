@@ -22,7 +22,7 @@ public class ProductCharacteristicValueServiceImpl implements ProductCharacteris
     }
 
     @Override
-    public ProductCharacteristicValue findByCharacteristicId(Long id) {
+    public List<ProductCharacteristicValue> findByCharacteristicId(Long id) {
         return productCharacteristicValueRepository.findByCharacteristicId(id);
     }
 

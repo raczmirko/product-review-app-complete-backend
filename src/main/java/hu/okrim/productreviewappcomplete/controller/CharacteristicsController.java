@@ -5,8 +5,10 @@ import hu.okrim.productreviewappcomplete.dto.CharacteristicDTO;
 import hu.okrim.productreviewappcomplete.mapper.CharacteristicMapper;
 import hu.okrim.productreviewappcomplete.model.Category;
 import hu.okrim.productreviewappcomplete.model.Characteristic;
+import hu.okrim.productreviewappcomplete.model.ProductCharacteristicValue;
 import hu.okrim.productreviewappcomplete.service.CategoryService;
 import hu.okrim.productreviewappcomplete.service.CharacteristicService;
+import hu.okrim.productreviewappcomplete.service.ProductCharacteristicsValueService;
 import hu.okrim.productreviewappcomplete.specification.CharacteristicSpecificationBuilder;
 import hu.okrim.productreviewappcomplete.util.SqlExceptionMessageHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,8 @@ public class CharacteristicsController {
     @Autowired
     CharacteristicService characteristicService;
     @Autowired
+    ProductCharacteristicsValueService productCharacteristicsValueService;
+    @Autowired
     CategoryService categoryService;
     @GetMapping("/all")
     public ResponseEntity<List<Characteristic>> getCharacteristics() {
@@ -46,6 +50,10 @@ public class CharacteristicsController {
     @PostMapping("/{id}/delete")
     public ResponseEntity<?> deleteCharacteristic(@PathVariable("id") Long id){
         try {
+            //First, delete all assigned values
+            List<ProductCharacteristicValue> foundValues = productCharacteristicsValueService.findByCharacteristicId(id);
+            foundValues.forEach(item -> productCharacteristicsValueService.deleteById(item.getId()));
+            //Then delete characteristic itself
             characteristicService.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception ex) {
@@ -58,6 +66,10 @@ public class CharacteristicsController {
     public ResponseEntity<?> deleteCharacteristics(@PathVariable("ids") Long[] ids){
         for(Long id : ids) {
             try {
+                //First, delete all assigned values
+                List<ProductCharacteristicValue> foundValues = productCharacteristicsValueService.findByCharacteristicId(id);
+                foundValues.forEach(item -> productCharacteristicsValueService.deleteById(item.getId()));
+                //Then delete characteristic itself
                 characteristicService.deleteById(id);
             } catch (Exception ex) {
                 String errorMessage = SqlExceptionMessageHandler.characteristicDeleteErrorMessage(ex);
