@@ -9,10 +9,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ReviewHeadService {
     ReviewHead findById(ReviewHeadId id);
-    ReviewHead findByUserAndProduct(User user, Product product);
+    Optional<ReviewHead> findByUserAndProduct(User user, Product product);
     void deleteById(ReviewHeadId id);
     void save (ReviewHead reviewHead);
     List<ReviewHead> findAll();

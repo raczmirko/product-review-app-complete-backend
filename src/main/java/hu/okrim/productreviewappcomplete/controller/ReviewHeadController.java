@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/review-head")
@@ -190,5 +191,19 @@ public class ReviewHeadController {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(orderByDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderByColumn));
         Page<ReviewHead> aspectsPage = reviewHeadService.findAllBySpecification(specification, pageable);
         return new ResponseEntity<>(aspectsPage, HttpStatus.OK);
+    }
+
+    @GetMapping("/{username}/{productId}/is-review-possible")
+    public ResponseEntity<?> checkIfReviewExists(@PathVariable("username") String username,
+                                                 @PathVariable("productId") Long productId) {
+        User user = userService.findByUsername(username);
+        Product product = productService.findById(productId);
+        Optional<ReviewHead> reviewHead = reviewHeadService.findByUserAndProduct(user, product);
+        if (reviewHead.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
     }
 }

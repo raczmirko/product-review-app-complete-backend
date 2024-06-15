@@ -13,6 +13,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReviewHeadServiceImpl implements ReviewHeadService{
@@ -25,9 +26,8 @@ public class ReviewHeadServiceImpl implements ReviewHeadService{
     }
 
     @Override
-    public ReviewHead findByUserAndProduct(User user, Product product) {
-        return reviewHeadRepository.findByUserAndProduct(user, product)
-                .orElseThrow(() -> new EntityNotFoundException(product.getId(), ReviewHead.class));
+    public Optional<ReviewHead> findByUserAndProduct(User user, Product product) {
+        return reviewHeadRepository.findByUserAndProduct(user, product);
     }
 
     @Override
