@@ -5,6 +5,7 @@ import hu.okrim.productreviewappcomplete.mapper.ArticleMapper;
 import hu.okrim.productreviewappcomplete.model.Article;
 import hu.okrim.productreviewappcomplete.service.ArticleService;
 import hu.okrim.productreviewappcomplete.specification.ArticleSpecificationBuilder;
+import hu.okrim.productreviewappcomplete.util.SqlExceptionMessageHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -44,8 +45,7 @@ public class ArticleController {
             articleService.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception ex) {
-            //TODO create custom exceptions
-            String errorMessage = ex.getMessage();
+            String errorMessage = SqlExceptionMessageHandler.articleDeleteErrorMessage(ex);
             return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
         }
     }
@@ -56,7 +56,7 @@ public class ArticleController {
             try {
                 articleService.deleteById(id);
             } catch (Exception ex) {
-                String errorMessage = ex.getMessage();
+                String errorMessage = SqlExceptionMessageHandler.articleDeleteErrorMessage(ex);
                 return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
             }
         }
@@ -78,7 +78,7 @@ public class ArticleController {
             articleService.save(existingArticle);
         }
         catch (Exception ex) {
-            String errorMessage = ex.getMessage();
+            String errorMessage = SqlExceptionMessageHandler.articleUpdateErrorMessage(ex);
             return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
         }
         return new ResponseEntity<>(HttpStatus.OK);

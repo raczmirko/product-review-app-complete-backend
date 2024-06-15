@@ -46,7 +46,7 @@ public class AspectController {
             return new ResponseEntity<>(HttpStatus.OK);
         }
         catch (Exception ex) {
-            String message = ex.getMessage();
+            String message = SqlExceptionMessageHandler.aspectDeleteErrorMessage(ex);
             return new ResponseEntity<>(message, HttpStatus.CONFLICT);
         }
     }

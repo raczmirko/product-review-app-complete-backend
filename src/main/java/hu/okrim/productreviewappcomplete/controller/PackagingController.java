@@ -7,6 +7,7 @@ import hu.okrim.productreviewappcomplete.model.Product;
 import hu.okrim.productreviewappcomplete.service.PackagingService;
 import hu.okrim.productreviewappcomplete.service.ProductService;
 import hu.okrim.productreviewappcomplete.specification.PackagingSpecificationBuilder;
+import hu.okrim.productreviewappcomplete.util.SqlExceptionMessageHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -48,7 +49,8 @@ public class PackagingController {
             packagingService.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception ex) {
-            return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+            String errorMessage = SqlExceptionMessageHandler.packagingDeleteErrorMessage(ex);
+            return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
         }
     }
 
@@ -58,7 +60,8 @@ public class PackagingController {
             try {
                 packagingService.deleteById(id);
             } catch (Exception ex) {
-                return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+                String errorMessage = SqlExceptionMessageHandler.packagingDeleteErrorMessage(ex);
+                return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
             }
         }
         return new ResponseEntity<>(HttpStatus.OK);
@@ -80,7 +83,7 @@ public class PackagingController {
             packagingService.save(existingPackaging);
         }
         catch (Exception ex) {
-            String errorMessage = ex.getMessage();
+            String errorMessage = SqlExceptionMessageHandler.packagingUpdateErrorMessage(ex);
             return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
         }
         return new ResponseEntity<>(HttpStatus.OK);

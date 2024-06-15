@@ -47,15 +47,13 @@ public class SqlExceptionMessageHandler {
         }
         return errorMessage;
     }
-
-    public static String categoryUpdateErrorMessage (Exception ex){
+    public static String categoryUpdateErrorMessage(Exception ex){
         String errorMessage = ex.getMessage();
         if (errorMessage.contains("characteristics are already assigned")) {
             errorMessage = "UPDATE FAILED: Changing this category is not allowed because characteristics are already assigned to it or it's subcategories, and updating would re-define the inheritance hierarchy.";
         }
         return errorMessage;
     }
-
     public static String characteristicDeleteErrorMessage(Exception ex) {
         String errorMessage = ex.getMessage();
         if(errorMessage.contains("fk_category_x_characteristic_characteristic")) {
@@ -64,7 +62,6 @@ public class SqlExceptionMessageHandler {
         }
         return errorMessage;
     }
-
     public static String characteristicCreateErrorMessage(Exception ex) {
         String errorMessage = ex.getMessage();
         if(errorMessage.contains("Modifying characteristics that already describe a category is not allowed.")) {
@@ -72,11 +69,55 @@ public class SqlExceptionMessageHandler {
         }
         return errorMessage;
     }
-
-    public static String aspectUpdateErrorMessage (Exception ex){
+    public static String aspectUpdateErrorMessage(Exception ex){
         String errorMessage = ex.getMessage();
         if (errorMessage.contains("Aspect already assigned")) {
             errorMessage = "UPDATE FAILED: Aspect with identical name already assigned to a category in the category hierarchy, which is not allowed.";
+        }
+        if(errorMessage.contains("This aspect cannot be modified because it already has reviews")) {
+            errorMessage = "UPDATE FAILED: This aspect cannot be modified because there are already reviews that were made from this aspect.";
+        }
+        return errorMessage;
+    }
+    public static String aspectDeleteErrorMessage(Exception ex) {
+        String errorMessage = ex.getMessage();
+        if (errorMessage.contains("This aspect cannot be deleted because it already has reviews")) {
+            errorMessage = "DELETION FAILED: This aspect cannot be deleted because there are already reviews that were made from this aspect.";
+        }
+        return errorMessage;
+    }
+    public static String productDeleteErrorMessage(Exception ex) {
+        String errorMessage = ex.getMessage();
+        if(errorMessage.contains("fk_review_head_product")) {
+            errorMessage = "DELETION FAILED: This product cannot be deleted because it already has reviews.";
+        }
+        return errorMessage;
+    }
+    public static String packagingUpdateErrorMessage(Exception ex) {
+        String errorMessage = ex.getMessage();
+        if(errorMessage.contains("Cannot change this packaging because it is used for at least one product.")) {
+            errorMessage = "UPDATE FAILED: Cannot change this packaging because it is used for at least one product.";
+        }
+        return errorMessage;
+    }
+    public static String packagingDeleteErrorMessage(Exception ex) {
+        String errorMessage = ex.getMessage();
+        if(errorMessage.contains("fk_product_packaging")) {
+            errorMessage = "DELETION FAILED: This packaging is already assigned to a product.";
+        }
+        return errorMessage;
+    }
+    public static String articleDeleteErrorMessage(Exception ex) {
+        String errorMessage = ex.getMessage();
+        if(errorMessage.contains("fk_product_article")) {
+            errorMessage = "DELETION FAILED: This article already has products. Delete all products first!";
+        }
+        return errorMessage;
+    }
+    public static String articleUpdateErrorMessage(Exception ex) {
+        String errorMessage = ex.getMessage();
+        if(errorMessage.contains("Cannot change article category")) {
+            errorMessage = "UPDATE FAILED: Cannot change article category because this article already has products.";
         }
         return errorMessage;
     }

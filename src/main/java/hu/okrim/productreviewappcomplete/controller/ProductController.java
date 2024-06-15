@@ -5,6 +5,7 @@ import hu.okrim.productreviewappcomplete.mapper.ProductMapper;
 import hu.okrim.productreviewappcomplete.model.Product;
 import hu.okrim.productreviewappcomplete.service.ProductService;
 import hu.okrim.productreviewappcomplete.specification.ProductSpecificationBuilder;
+import hu.okrim.productreviewappcomplete.util.SqlExceptionMessageHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -44,8 +45,7 @@ public class ProductController {
             productService.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception ex) {
-            //TODO create custom exceptions
-            String errorMessage = ex.getMessage();
+            String errorMessage = SqlExceptionMessageHandler.productDeleteErrorMessage(ex);
             return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
         }
     }
@@ -56,7 +56,7 @@ public class ProductController {
             try {
                 productService.deleteById(id);
             } catch (Exception ex) {
-                String errorMessage = ex.getMessage();
+                String errorMessage = SqlExceptionMessageHandler.productDeleteErrorMessage(ex);
                 return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
             }
         }
