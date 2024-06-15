@@ -1,6 +1,7 @@
 package hu.okrim.productreviewappcomplete.service;
 
 import hu.okrim.productreviewappcomplete.model.ReviewBody;
+import hu.okrim.productreviewappcomplete.model.compositeKey.ReviewBodyId;
 import hu.okrim.productreviewappcomplete.repository.ReviewBodyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,5 +20,10 @@ public class ReviewBodyServiceImpl implements ReviewBodyService{
     @Override
     public void saveAll(List<ReviewBody> reviewBodyList) {
         reviewBodyRepository.saveAll(reviewBodyList);
+    }
+
+    @Override
+    public void deleteById(ReviewBodyId reviewBodyId) {
+        reviewBodyRepository.deleteById(reviewBodyId);
     }
 }

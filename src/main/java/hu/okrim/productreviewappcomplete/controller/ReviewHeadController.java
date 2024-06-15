@@ -145,7 +145,13 @@ public class ReviewHeadController {
         List<ReviewBody> reviewBodies = new ArrayList<>();
         for(AspectWithValueDTO aspect: aspects) {
             ReviewBodyId bodyId = new ReviewBodyId(user.getId(), product.getId(), aspect.getId());
-            reviewBodies.add(new ReviewBody(bodyId, aspect.getScore(), reviewHead));
+            //If aspect is sent with a null score it should be deleted from reviewBody
+            if(aspect.getScore() == null) {
+                reviewBodyService.deleteById(bodyId);
+            }
+            else {
+                reviewBodies.add(new ReviewBody(bodyId, aspect.getScore(), reviewHead));
+            }
         }
 
         try {
