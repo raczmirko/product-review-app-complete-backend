@@ -28,6 +28,15 @@ public class SecurityConfig {
             .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers(HttpMethod.POST, SecurityConstants.REGISTER_PATH).permitAll()
                     .requestMatchers(HttpMethod.GET, "/country/all").permitAll()
+                    // Define role-based access control
+                    // Reviews can be modified by both users and admins
+                    // Security endpoint is required for the frontend to work
+                    .requestMatchers("/review-head/**").hasAnyRole("USER", "ADMIN")
+                    .requestMatchers("/security/**").hasAnyRole("USER", "ADMIN")
+                    // GET methods should work for anyone
+                    .requestMatchers(HttpMethod.GET, "/**").hasAnyRole("USER", "ADMIN")
+                    // Any other request is only accessible to admins
+                    .requestMatchers("/**").hasRole("ADMIN")
                     .anyRequest().authenticated()
             )
             .addFilterBefore(new ExceptionHandlerFilter(), AuthenticationFilter.class)
