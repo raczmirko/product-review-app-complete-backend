@@ -10,6 +10,9 @@ import hu.okrim.productreviewappcomplete.service.ReviewBodyService;
 import hu.okrim.productreviewappcomplete.service.ReviewHeadService;
 import hu.okrim.productreviewappcomplete.service.UserService;
 import hu.okrim.productreviewappcomplete.specification.ReviewHeadSpecificationBuilder;
+import hu.okrim.productreviewappcomplete.util.AuthorizationUtil;
+import hu.okrim.productreviewappcomplete.util.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,6 +41,10 @@ public class ReviewHeadController {
     private ProductService productService;
     @Autowired
     private ReviewBodyService reviewBodyService;
+    @Autowired
+    private JwtUtil jwtUtil;
+    @Autowired
+    private AuthorizationUtil authorizationUtil;
 
     @GetMapping("/{user}/{product}")
     public ResponseEntity<ReviewHead> findById(@PathVariable("user") Long userId, @PathVariable("product") Long productId) {
@@ -78,42 +85,71 @@ public class ReviewHeadController {
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<?> deleteReviewHead(@RequestBody Map<String, String> request) {
+    public ResponseEntity<?> deleteReviewHead(@RequestBody Map<String, String> request,
+                                              HttpServletRequest httpRequest) {
         String username = request.get("username");
         Long productId = Long.parseLong(request.get("productId"));
-        User user = userService.findByUsername(username);
 
+        ResponseEntity<?> authorizationResponse = authorizationUtil.checkAuthorization(httpRequest, username);
+        String userRole = jwtUtil.extractUserRoleFromToken(httpRequest);
+        if (authorizationResponse != null && !userRole.equals("ADMIN")) {
+            return authorizationResponse;
+        }
+
+        User user = userService.findByUsername(username);
         ReviewHeadId id = new ReviewHeadId(user.getId(), productId);
+
         try {
             reviewHeadService.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception ex) {
-            String message = ex.getMessage();
-            return new ResponseEntity<>(message, HttpStatus.CONFLICT);
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
         }
     }
 
-//    @PostMapping("/multi-delete")
-//    public ResponseEntity<?> deleteReviewHeads(@RequestParam("idKeyPairs") Long[] idKeyPairs) {
-//        try {
-//            for (int i = 0; i < userIds.length; i++) {
-//                ReviewHeadId id = new ReviewHeadId(userIds[i], productIds[i]);
-//                reviewHeadService.deleteById(id);
-//            }
-//            return new ResponseEntity<>(HttpStatus.OK);
-//        } catch (Exception ex) {
-//            String message = SqlExceptionMessageHandler.reviewHeadDeleteErrorMessage(ex);
-//            return new ResponseEntity<>(message, HttpStatus.CONFLICT);
-//        }
-//    }
+    @PostMapping("/multi-delete")
+    public ResponseEntity<?> deleteReviewHeads(@RequestBody List<String> keyPairs,
+                                               HttpServletRequest httpRequest) {
+        //Frontend is sending key pairs in "username-productId" format
+        for(String keyPair : keyPairs){
+            String[] parts = keyPair.split("-");
+            String username = parts[0];
+            Long productId = Long.parseLong(parts[1]);
+
+            //For each key pair (a review) user's authorization should be checked
+            ResponseEntity<?> authorizationResponse = authorizationUtil.checkAuthorization(httpRequest, username);
+            String userRole = jwtUtil.extractUserRoleFromToken(httpRequest);
+            if (authorizationResponse != null && !userRole.equals("ADMIN")) {
+                return authorizationResponse;
+            }
+
+            User user = userService.findByUsername(username);
+            ReviewHeadId id = new ReviewHeadId(user.getId(), productId);
+
+            try {
+                reviewHeadService.deleteById(id);
+            } catch (Exception ex) {
+                return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
     @PutMapping("/{username}/{productId}/modify")
-    public ResponseEntity<HttpStatus> modifyReviewHead(@PathVariable("username") String username,
+    public ResponseEntity<?> modifyReviewHead(@PathVariable("username") String username,
                                                        @PathVariable("productId") Long productId,
-                                                       @RequestBody ReviewHeadDTO reviewHeadDTO) {
+                                                       @RequestBody ReviewHeadDTO reviewHeadDTO,
+                                                       HttpServletRequest httpRequest) {
+        ResponseEntity<?> authorizationResponse = authorizationUtil.checkAuthorization(httpRequest, username);
+        String userRole = jwtUtil.extractUserRoleFromToken(httpRequest);
+        if (authorizationResponse != null && !userRole.equals("ADMIN")) {
+            return authorizationResponse;
+        }
+
         User user = userService.findByUsername(username);
         Product product = productService.findById(productId);
         ReviewHeadId id = new ReviewHeadId(user.getId(), product.getId());
+
         ReviewHead existingReviewHead = reviewHeadService.findById(id);
         if (existingReviewHead == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -133,7 +169,14 @@ public class ReviewHeadController {
     @PostMapping("/{username}/{productId}/attach-review-body")
     public ResponseEntity<?> attachReviewBody(@PathVariable("username") String username,
                                               @PathVariable("productId") Long productId,
-                                              @RequestBody List<AspectWithValueDTO> aspects) {
+                                              @RequestBody List<AspectWithValueDTO> aspects,
+                                              HttpServletRequest httpRequest) {
+        ResponseEntity<?> authorizationResponse = authorizationUtil.checkAuthorization(httpRequest, username);
+        String userRole = jwtUtil.extractUserRoleFromToken(httpRequest);
+        if (authorizationResponse != null && !userRole.equals("ADMIN")) {
+            return authorizationResponse;
+        }
+
         User user = userService.findByUsername(username);
         Product product = productService.findById(productId);
         ReviewHeadId headId = new ReviewHeadId(user.getId(), product.getId());
