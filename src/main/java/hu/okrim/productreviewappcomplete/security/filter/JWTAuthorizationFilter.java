@@ -2,6 +2,9 @@ package hu.okrim.productreviewappcomplete.security.filter;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import hu.okrim.productreviewappcomplete.security.SecurityConstants;
 import jakarta.servlet.FilterChain;
@@ -10,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -33,7 +37,11 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
             .verify(token)
             .getSubject();
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, Arrays.asList());
+        // Extract roles from JWT token claims
+        List<String> roles = JWT.decode(token).getClaim("roles").asList(String.class);
+        List<SimpleGrantedAuthority> authorities = roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role)).toList();
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(user, null,  authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         filterChain.doFilter(request, response);
     }
