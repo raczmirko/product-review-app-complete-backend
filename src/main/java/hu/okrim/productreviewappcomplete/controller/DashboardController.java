@@ -7,9 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -56,8 +54,9 @@ public class DashboardController {
     }
 
     @GetMapping("/most-active-users")
-    public ResponseEntity<List<DashboardMostActiveUserDTO>> getMostActiveUsers(){
-        Pageable topThree = PageRequest.of(0, 3);
+    public ResponseEntity<List<DashboardMostActiveUserDTO>> getMostActiveUsers(@RequestParam("userCount") Integer userCount){
+        if(userCount == 0) userCount = 3;
+        Pageable topThree = PageRequest.of(0, userCount);
         List<DashboardMostActiveUserDTO> returnMap = userService.findMostActiveUsers(topThree);
         return new ResponseEntity<>(returnMap, HttpStatus.OK);
     }
