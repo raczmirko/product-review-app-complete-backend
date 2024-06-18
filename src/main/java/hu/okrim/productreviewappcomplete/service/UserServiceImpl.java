@@ -1,14 +1,15 @@
 package hu.okrim.productreviewappcomplete.service;
 
+import hu.okrim.productreviewappcomplete.dto.DashboardMostActiveUserDTO;
 import hu.okrim.productreviewappcomplete.model.User;
 import hu.okrim.productreviewappcomplete.repository.UserRepository;
 import hu.okrim.productreviewappcomplete.exception.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -48,6 +49,11 @@ public class UserServiceImpl implements UserService{
     public String getUserRole(String username) {
         Optional<User> user = userRepository.findByUsername(username);
         return user.isPresent() ? user.get().getRole().getName() : "error";
+    }
+
+    @Override
+    public List<DashboardMostActiveUserDTO> findMostActiveUsers(Pageable pageable) {
+        return userRepository.findMostActiveUsers(pageable);
     }
 
     static User unwrapUser(Optional<User> entity, Long id) {
