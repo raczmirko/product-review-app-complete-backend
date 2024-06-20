@@ -1,5 +1,6 @@
 package hu.okrim.productreviewappcomplete.service;
 
+import hu.okrim.productreviewappcomplete.dto.DashboardReviewByMonthDTO;
 import hu.okrim.productreviewappcomplete.model.Product;
 import hu.okrim.productreviewappcomplete.model.ReviewHead;
 import hu.okrim.productreviewappcomplete.model.User;
@@ -18,4 +19,5 @@ public interface ReviewHeadService {
     void save (ReviewHead reviewHead);
     List<ReviewHead> findAll();
     Page<ReviewHead> findAllBySpecification(Specification<ReviewHead> specification, Pageable pageable);
+    List<DashboardReviewByMonthDTO> findThisYearsReviewsGroupByMonth();
 }

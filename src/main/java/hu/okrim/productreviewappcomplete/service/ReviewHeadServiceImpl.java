@@ -1,5 +1,6 @@
 package hu.okrim.productreviewappcomplete.service;
 
+import hu.okrim.productreviewappcomplete.dto.DashboardReviewByMonthDTO;
 import hu.okrim.productreviewappcomplete.exception.EntityNotFoundException;
 import hu.okrim.productreviewappcomplete.model.Product;
 import hu.okrim.productreviewappcomplete.model.ReviewHead;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,5 +50,11 @@ public class ReviewHeadServiceImpl implements ReviewHeadService{
     @Override
     public Page<ReviewHead> findAllBySpecification(Specification<ReviewHead> specification, Pageable pageable) {
         return reviewHeadRepository.findAll(specification, pageable);
+    }
+
+    @Override
+    public List<DashboardReviewByMonthDTO> findThisYearsReviewsGroupByMonth() {
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        return reviewHeadRepository.findThisYearsReviewsGroupByMonth(currentYear);
     }
 }

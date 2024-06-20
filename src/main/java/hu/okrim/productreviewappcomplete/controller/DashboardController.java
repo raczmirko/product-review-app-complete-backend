@@ -1,6 +1,7 @@
 package hu.okrim.productreviewappcomplete.controller;
 
 import hu.okrim.productreviewappcomplete.dto.DashboardMostActiveUserDTO;
+import hu.okrim.productreviewappcomplete.dto.DashboardReviewByMonthDTO;
 import hu.okrim.productreviewappcomplete.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -57,7 +58,13 @@ public class DashboardController {
     public ResponseEntity<List<DashboardMostActiveUserDTO>> getMostActiveUsers(@RequestParam("userCount") Integer userCount){
         if(userCount == 0) userCount = 3;
         Pageable topThree = PageRequest.of(0, userCount);
-        List<DashboardMostActiveUserDTO> returnMap = userService.findMostActiveUsers(topThree);
-        return new ResponseEntity<>(returnMap, HttpStatus.OK);
+        List<DashboardMostActiveUserDTO> returnList = userService.findMostActiveUsers(topThree);
+        return new ResponseEntity<>(returnList, HttpStatus.OK);
+    }
+
+    @GetMapping("/reviews-this-year")
+    public ResponseEntity<List<DashboardReviewByMonthDTO>> getReviewsThisYear(){
+        List<DashboardReviewByMonthDTO> returnList = reviewHeadService.findThisYearsReviewsGroupByMonth();
+        return new ResponseEntity<>(returnList, HttpStatus.OK);
     }
 }
