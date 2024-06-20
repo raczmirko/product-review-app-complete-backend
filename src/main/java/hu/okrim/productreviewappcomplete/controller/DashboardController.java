@@ -2,7 +2,11 @@ package hu.okrim.productreviewappcomplete.controller;
 
 import hu.okrim.productreviewappcomplete.dto.DashboardMostActiveUserDTO;
 import hu.okrim.productreviewappcomplete.dto.DashboardReviewByMonthDTO;
+import hu.okrim.productreviewappcomplete.dto.DashboardUserRatingsPerCategoryDTO;
+import hu.okrim.productreviewappcomplete.model.User;
 import hu.okrim.productreviewappcomplete.service.*;
+import hu.okrim.productreviewappcomplete.util.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +41,8 @@ public class DashboardController {
     ReviewHeadService reviewHeadService;
     @Autowired
     UserService userService;
+    @Autowired
+    JwtUtil tokenUtil;
 
     @GetMapping("/record-amounts")
     public ResponseEntity<Map<String, Integer>> getRecordAmounts(){
@@ -65,6 +71,13 @@ public class DashboardController {
     @GetMapping("/reviews-this-year")
     public ResponseEntity<List<DashboardReviewByMonthDTO>> getReviewsThisYear(){
         List<DashboardReviewByMonthDTO> returnList = reviewHeadService.findThisYearsReviewsGroupByMonth();
+        return new ResponseEntity<>(returnList, HttpStatus.OK);
+    }
+
+    @GetMapping("/user-reviews-per-category")
+    public ResponseEntity<List<DashboardUserRatingsPerCategoryDTO>> getUserReviewsPerCategory(HttpServletRequest request){
+        User user = userService.findByUsername(tokenUtil.extractUserFromToken(request));
+        List<DashboardUserRatingsPerCategoryDTO> returnList = reviewHeadService.findUserRatingsPerCategory(user.getId());
         return new ResponseEntity<>(returnList, HttpStatus.OK);
     }
 }

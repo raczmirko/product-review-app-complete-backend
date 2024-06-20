@@ -1,6 +1,7 @@
 package hu.okrim.productreviewappcomplete.service;
 
 import hu.okrim.productreviewappcomplete.dto.DashboardReviewByMonthDTO;
+import hu.okrim.productreviewappcomplete.dto.DashboardUserRatingsPerCategoryDTO;
 import hu.okrim.productreviewappcomplete.exception.EntityNotFoundException;
 import hu.okrim.productreviewappcomplete.model.Product;
 import hu.okrim.productreviewappcomplete.model.ReviewHead;
@@ -56,5 +57,10 @@ public class ReviewHeadServiceImpl implements ReviewHeadService{
     public List<DashboardReviewByMonthDTO> findThisYearsReviewsGroupByMonth() {
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
         return reviewHeadRepository.findThisYearsReviewsGroupByMonth(currentYear);
+    }
+
+    @Override
+    public List<DashboardUserRatingsPerCategoryDTO> findUserRatingsPerCategory(Long userId) {
+        return reviewHeadRepository.findUserRatingsPerCategory(userId);
     }
 }
