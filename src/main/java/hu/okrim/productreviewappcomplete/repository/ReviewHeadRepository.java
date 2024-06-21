@@ -2,6 +2,7 @@ package hu.okrim.productreviewappcomplete.repository;
 
 import hu.okrim.productreviewappcomplete.dto.DashboardMostActiveUserDTO;
 import hu.okrim.productreviewappcomplete.dto.DashboardReviewByMonthDTO;
+import hu.okrim.productreviewappcomplete.dto.DashboardUserBestRatedProductsDTO;
 import hu.okrim.productreviewappcomplete.dto.DashboardUserRatingsPerCategoryDTO;
 import hu.okrim.productreviewappcomplete.model.Product;
 import hu.okrim.productreviewappcomplete.model.ReviewHead;
@@ -41,4 +42,15 @@ public interface ReviewHeadRepository extends JpaRepository<ReviewHead, ReviewHe
             "WHERE r.user.id = :userId " +
             "GROUP BY c ")
     List<DashboardUserRatingsPerCategoryDTO> findUserRatingsPerCategory(@Param("userId") Long userId);
+
+    @Query("SELECT new hu.okrim.productreviewappcomplete.dto.DashboardUserBestRatedProductsDTO(" +
+            "rh.product, " +
+            "AVG(rh.valueForPrice) + COALESCE(AVG(rb.score), 0) AS scoreAverage) " +
+            "FROM ReviewHead rh LEFT JOIN ReviewBody rb " +
+            "ON rh.product.id = rb.id.productId AND rh.user.id = rb.id.userId " +
+            "WHERE rh.user.id = :userId " +
+            "GROUP BY rh.product " +
+            "ORDER BY scoreAverage DESC " +
+            "LIMIT 3")
+    List<DashboardUserBestRatedProductsDTO> findUserBestRatedProducts(@Param("userId") Long userId);
 }

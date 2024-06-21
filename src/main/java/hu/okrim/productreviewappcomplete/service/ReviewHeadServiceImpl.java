@@ -1,6 +1,7 @@
 package hu.okrim.productreviewappcomplete.service;
 
 import hu.okrim.productreviewappcomplete.dto.DashboardReviewByMonthDTO;
+import hu.okrim.productreviewappcomplete.dto.DashboardUserBestRatedProductsDTO;
 import hu.okrim.productreviewappcomplete.dto.DashboardUserRatingsPerCategoryDTO;
 import hu.okrim.productreviewappcomplete.exception.EntityNotFoundException;
 import hu.okrim.productreviewappcomplete.model.Product;
@@ -62,5 +63,10 @@ public class ReviewHeadServiceImpl implements ReviewHeadService{
     @Override
     public List<DashboardUserRatingsPerCategoryDTO> findUserRatingsPerCategory(Long userId) {
         return reviewHeadRepository.findUserRatingsPerCategory(userId);
+    }
+
+    @Override
+    public List<DashboardUserBestRatedProductsDTO> findUserBestRatedProducts(Long userId) {
+        return reviewHeadRepository.findUserBestRatedProducts(userId);
     }
 }

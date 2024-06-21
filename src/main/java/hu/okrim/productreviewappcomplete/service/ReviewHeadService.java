@@ -1,6 +1,7 @@
 package hu.okrim.productreviewappcomplete.service;
 
 import hu.okrim.productreviewappcomplete.dto.DashboardReviewByMonthDTO;
+import hu.okrim.productreviewappcomplete.dto.DashboardUserBestRatedProductsDTO;
 import hu.okrim.productreviewappcomplete.dto.DashboardUserRatingsPerCategoryDTO;
 import hu.okrim.productreviewappcomplete.model.Product;
 import hu.okrim.productreviewappcomplete.model.ReviewHead;
@@ -23,4 +24,6 @@ public interface ReviewHeadService {
     List<DashboardReviewByMonthDTO> findThisYearsReviewsGroupByMonth();
 
     List<DashboardUserRatingsPerCategoryDTO> findUserRatingsPerCategory(Long userId);
+
+    List<DashboardUserBestRatedProductsDTO> findUserBestRatedProducts(Long userId);
 }
