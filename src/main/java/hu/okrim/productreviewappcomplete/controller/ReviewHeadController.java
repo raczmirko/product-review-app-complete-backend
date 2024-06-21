@@ -173,7 +173,7 @@ public class ReviewHeadController {
                                               HttpServletRequest httpRequest) {
         ResponseEntity<?> authorizationResponse = authorizationUtil.checkAuthorization(httpRequest, username);
         String userRole = jwtUtil.extractUserRoleFromToken(httpRequest);
-        if (authorizationResponse != null && !userRole.equals("ADMIN")) {
+        if (authorizationResponse != null) {
             return authorizationResponse;
         }
 
