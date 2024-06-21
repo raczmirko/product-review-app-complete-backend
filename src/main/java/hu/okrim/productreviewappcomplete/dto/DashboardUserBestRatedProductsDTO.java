@@ -13,4 +13,5 @@ import lombok.Setter;
 public class DashboardUserBestRatedProductsDTO {
     private Product product;
     private Double scoreAverage;
+    private Long rank;
 }
