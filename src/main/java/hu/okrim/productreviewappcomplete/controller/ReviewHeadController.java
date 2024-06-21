@@ -172,7 +172,6 @@ public class ReviewHeadController {
                                               @RequestBody List<AspectWithValueDTO> aspects,
                                               HttpServletRequest httpRequest) {
         ResponseEntity<?> authorizationResponse = authorizationUtil.checkAuthorization(httpRequest, username);
-        String userRole = jwtUtil.extractUserRoleFromToken(httpRequest);
         if (authorizationResponse != null) {
             return authorizationResponse;
         }
