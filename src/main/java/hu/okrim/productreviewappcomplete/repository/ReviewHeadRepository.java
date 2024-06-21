@@ -45,7 +45,7 @@ public interface ReviewHeadRepository extends JpaRepository<ReviewHead, ReviewHe
 
     @Query("SELECT new hu.okrim.productreviewappcomplete.dto.DashboardUserBestRatedProductsDTO(" +
             "rh.product, " +
-            "AVG(rh.valueForPrice) + COALESCE(AVG(rb.score), 0) AS scoreAverage) " +
+            "ROUND(AVG(rh.valueForPrice) + COALESCE(AVG(rb.score), 0), 2) AS scoreAverage) " +
             "FROM ReviewHead rh LEFT JOIN ReviewBody rb " +
             "ON rh.product.id = rb.id.productId AND rh.user.id = rb.id.userId " +
             "WHERE rh.user.id = :userId " +
