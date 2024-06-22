@@ -43,15 +43,28 @@ public interface ReviewHeadRepository extends JpaRepository<ReviewHead, ReviewHe
             "GROUP BY c ")
     List<DashboardUserRatingsPerCategoryDTO> findUserRatingsPerCategory(@Param("userId") Long userId);
 
-    @Query("SELECT new hu.okrim.productreviewappcomplete.dto.DashboardUserBestRatedProductsDTO(" +
-            "rh.product, " +
+//    @Query("SELECT new hu.okrim.productreviewappcomplete.dto.DashboardUserBestRatedProductsDTO(" +
+//            "rh.product, " +
+//            "ROUND(AVG(rh.valueForPrice) + COALESCE(AVG(rb.score), 0), 2) AS scoreAverage, " +
+//            "DENSE_RANK() OVER(ORDER BY AVG(rh.valueForPrice) + COALESCE(AVG(rb.score), 0) DESC)) " +
+//            "FROM ReviewHead rh LEFT JOIN ReviewBody rb " +
+//            "ON rh.product.id = rb.id.productId AND rh.user.id = rb.id.userId " +
+//            "WHERE rh.user.id = :userId " +
+//            "GROUP BY rh.product " +
+//            "ORDER BY scoreAverage DESC " +
+//            "LIMIT 3")
+    @Query( "WITH helper_table AS (" +
+            "SELECT " +
+            "rh.product AS product, " +
             "ROUND(AVG(rh.valueForPrice) + COALESCE(AVG(rb.score), 0), 2) AS scoreAverage, " +
-            "DENSE_RANK() OVER(ORDER BY AVG(rh.valueForPrice) + COALESCE(AVG(rb.score), 0) DESC)) " +
+            "DENSE_RANK() OVER(ORDER BY AVG(rh.valueForPrice) + COALESCE(AVG(rb.score), 0) DESC) AS rank " +
             "FROM ReviewHead rh LEFT JOIN ReviewBody rb " +
             "ON rh.product.id = rb.id.productId AND rh.user.id = rb.id.userId " +
             "WHERE rh.user.id = :userId " +
-            "GROUP BY rh.product " +
-            "ORDER BY scoreAverage DESC " +
-            "LIMIT 3")
+            "GROUP BY rh.product) " +
+        "SELECT new hu.okrim.productreviewappcomplete.dto.DashboardUserBestRatedProductsDTO(product, scoreAverage, rank) " +
+        "FROM helper_table " +
+        "WHERE rank <= 3 " +
+        "ORDER BY scoreAverage DESC")
     List<DashboardUserBestRatedProductsDTO> findUserBestRatedProducts(@Param("userId") Long userId);
 }
