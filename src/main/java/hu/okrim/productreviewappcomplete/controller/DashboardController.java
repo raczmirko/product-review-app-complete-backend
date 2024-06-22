@@ -6,6 +6,7 @@ import hu.okrim.productreviewappcomplete.dto.DashboardUserBestRatedProductsDTO;
 import hu.okrim.productreviewappcomplete.dto.DashboardUserRatingsPerCategoryDTO;
 import hu.okrim.productreviewappcomplete.model.User;
 import hu.okrim.productreviewappcomplete.model.views.MostPopularArticlesPerBrandView;
+import hu.okrim.productreviewappcomplete.model.views.MostPopularArticlesPerCategoryView;
 import hu.okrim.productreviewappcomplete.service.*;
 import hu.okrim.productreviewappcomplete.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,6 +46,8 @@ public class DashboardController {
     UserService userService;
     @Autowired
     MostPopularArticlesPerBrandViewService mostPopularArticlesPerBrandViewService;
+    @Autowired
+    MostPopularArticlesPerCategoryViewService mostPopularArticlesPerCategoryViewService;
     @Autowired
     JwtUtil tokenUtil;
 
@@ -95,6 +98,12 @@ public class DashboardController {
     @GetMapping("/view-most-popular-articles-per-brand")
     public ResponseEntity<List<MostPopularArticlesPerBrandView>> getMostPopularProductsPerBrand(){
         List<MostPopularArticlesPerBrandView> returnList = mostPopularArticlesPerBrandViewService.findAll();
+        return new ResponseEntity<>(returnList, HttpStatus.OK);
+    }
+
+    @GetMapping("/view-most-popular-articles-per-category")
+    public ResponseEntity<List<MostPopularArticlesPerCategoryView>> getMostPopularProductsPerCategory(){
+        List<MostPopularArticlesPerCategoryView> returnList = mostPopularArticlesPerCategoryViewService.findAll();
         return new ResponseEntity<>(returnList, HttpStatus.OK);
     }
 }

@@ -282,6 +282,28 @@ WITH product_rating_averages AS (
 
 GO
 
+CREATE OR ALTER VIEW v_most_popular_articles_of_categories
+AS
+WITH product_rating_averages AS (
+		SELECT c.name AS category, a.name AS article, (COALESCE(AVG(CAST(rb.score AS decimal)), 5) + rh.value_for_price) / 2 AS average
+		FROM review_head AS rh
+		LEFT JOIN review_body rb ON rb.[user] = rh.[user] AND rb.product = rh.product
+		INNER JOIN product p ON rh.product = p.id
+		INNER JOIN article a ON p.article = a.id
+		INNER JOIN category c ON a.category = c.id
+		GROUP BY c.name, a.name, rh.value_for_price
+	),
+	product_best_ratings AS (
+		SELECT category, article, average,
+			RANK() OVER (PARTITION BY category ORDER BY average DESC) as ranking
+		FROM product_rating_averages
+	)
+	SELECT category, article, average
+	FROM product_best_ratings
+	WHERE ranking = 1
+
+GO
+
 CREATE OR ALTER VIEW v_which_packaging_is_the_most_popular_for_each_article
 AS
 WITH packaging_rating_averages AS (
