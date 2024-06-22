@@ -260,7 +260,7 @@ WITH users_with_product AS (
 
 GO
 
-CREATE OR ALTER VIEW v_most_popular_products_of_brands
+CREATE OR ALTER VIEW v_most_popular_articles_of_brands
 AS
 WITH product_rating_averages AS (
 		SELECT b.name AS brand, a.name AS article, (COALESCE(AVG(CAST(rb.score AS decimal)), 5) + rh.value_for_price) / 2 AS average

@@ -1,6 +1,5 @@
 package hu.okrim.productreviewappcomplete.model.views;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -14,8 +13,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "v_most_popular_products_of_brands")
-public class MostPopularProductsPerBrandView {
+@Table(name = "v_most_popular_articles_of_brands")
+public class MostPopularArticlesPerBrandView {
     @Id
     private String brand;
     private String article;
