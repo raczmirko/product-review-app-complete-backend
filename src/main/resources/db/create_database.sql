@@ -263,15 +263,16 @@ GO
 CREATE OR ALTER VIEW v_most_popular_products_of_brands
 AS
 WITH product_rating_averages AS (
-		SELECT b.name AS brand, a.name AS product, product AS pid, AVG(CAST(rb.score AS decimal)) AS average
-		FROM review_body AS rb
-		INNER JOIN product p ON rb.product = p.id
+		SELECT b.name AS brand, a.name AS article, (COALESCE(AVG(CAST(rb.score AS decimal)), 5) + rh.value_for_price) / 2 AS average
+		FROM review_head AS rh
+		LEFT JOIN review_body rb ON rb.[user] = rh.[user] AND rb.product = rh.product
+		INNER JOIN product p ON rh.product = p.id
 		INNER JOIN article a ON p.article = a.id
 		INNER JOIN brand b ON a.brand = b.id
-		GROUP BY b.name, a.name, product
+		GROUP BY b.name, a.name, rh.value_for_price
 	),
 	product_best_ratings AS (
-		SELECT brand, product, pid, average,
+		SELECT brand, article, average,
 			RANK() OVER (PARTITION BY brand ORDER BY average DESC) as ranking
 		FROM product_rating_averages
 	)
