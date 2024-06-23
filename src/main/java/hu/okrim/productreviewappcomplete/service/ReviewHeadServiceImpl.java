@@ -69,4 +69,9 @@ public class ReviewHeadServiceImpl implements ReviewHeadService{
     public List<DashboardUserBestRatedProductsDTO> findUserBestRatedProducts(Long userId) {
         return reviewHeadRepository.findUserBestRatedProducts(userId);
     }
+
+    @Override
+    public Double findUserDomesticProductPercentage(Long id) {
+        return reviewHeadRepository.findUserDomesticProductPercentage(id);
+    }
 }

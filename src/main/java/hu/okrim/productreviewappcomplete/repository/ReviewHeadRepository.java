@@ -43,16 +43,6 @@ public interface ReviewHeadRepository extends JpaRepository<ReviewHead, ReviewHe
             "GROUP BY c ")
     List<DashboardUserRatingsPerCategoryDTO> findUserRatingsPerCategory(@Param("userId") Long userId);
 
-//    @Query("SELECT new hu.okrim.productreviewappcomplete.dto.DashboardUserBestRatedProductsDTO(" +
-//            "rh.product, " +
-//            "ROUND(AVG(rh.valueForPrice) + COALESCE(AVG(rb.score), 0), 2) AS scoreAverage, " +
-//            "DENSE_RANK() OVER(ORDER BY AVG(rh.valueForPrice) + COALESCE(AVG(rb.score), 0) DESC)) " +
-//            "FROM ReviewHead rh LEFT JOIN ReviewBody rb " +
-//            "ON rh.product.id = rb.id.productId AND rh.user.id = rb.id.userId " +
-//            "WHERE rh.user.id = :userId " +
-//            "GROUP BY rh.product " +
-//            "ORDER BY scoreAverage DESC " +
-//            "LIMIT 3")
     @Query( "WITH helper_table AS (" +
             "SELECT " +
             "rh.product AS product, " +
@@ -67,4 +57,25 @@ public interface ReviewHeadRepository extends JpaRepository<ReviewHead, ReviewHe
         "WHERE rank <= 3 " +
         "ORDER BY scoreAverage DESC")
     List<DashboardUserBestRatedProductsDTO> findUserBestRatedProducts(@Param("userId") Long userId);
+
+    @Query(
+        "WITH domestic_review_count AS (" +
+            "SELECT COUNT(1) AS domestic " +
+            "FROM ReviewHead rh " +
+            "INNER JOIN Product p ON rh.product.id = p.id " +
+            "INNER JOIN Article a ON p.article.id = a.id " +
+            "INNER JOIN User u ON rh.user.id = u.id " +
+            "INNER JOIN Brand b ON a.brand.id = b.id " +
+            "WHERE b.countryOfOrigin.countryCode = u.country.countryCode " +
+            "AND rh.user.id = :userId" +
+            "), " +
+            "review_total AS (" +
+            "SELECT COUNT(1) AS total " +
+            "FROM ReviewHead " +
+            "WHERE user.id = :userId" +
+            ") " +
+            "SELECT ROUND(domestic * 1.0 / total * 100, 2)" +
+            "FROM domestic_review_count, review_total"
+    )
+    Double findUserDomesticProductPercentage(@Param("userId") Long userId);
 }

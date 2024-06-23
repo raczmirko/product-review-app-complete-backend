@@ -22,8 +22,7 @@ public interface ReviewHeadService {
     List<ReviewHead> findAll();
     Page<ReviewHead> findAllBySpecification(Specification<ReviewHead> specification, Pageable pageable);
     List<DashboardReviewByMonthDTO> findThisYearsReviewsGroupByMonth();
-
     List<DashboardUserRatingsPerCategoryDTO> findUserRatingsPerCategory(Long userId);
-
     List<DashboardUserBestRatedProductsDTO> findUserBestRatedProducts(Long userId);
+    Double findUserDomesticProductPercentage(Long id);
 }

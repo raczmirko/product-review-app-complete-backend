@@ -106,4 +106,11 @@ public class DashboardController {
         List<MostPopularArticlesPerCategoryView> returnList = mostPopularArticlesPerCategoryViewService.findAll();
         return new ResponseEntity<>(returnList, HttpStatus.OK);
     }
+
+    @GetMapping("/user-domestic-product-percentage")
+    public ResponseEntity<Double> getUserDomesticProductPercentage(HttpServletRequest request){
+        User user = userService.findByUsername(tokenUtil.extractUserFromToken(request));
+        Double percentage = reviewHeadService.findUserDomesticProductPercentage(user.getId());
+        return new ResponseEntity<>(percentage, HttpStatus.OK);
+    }
 }
