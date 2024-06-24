@@ -7,6 +7,7 @@ import hu.okrim.productreviewappcomplete.dto.DashboardUserRatingsPerCategoryDTO;
 import hu.okrim.productreviewappcomplete.model.User;
 import hu.okrim.productreviewappcomplete.model.views.MostPopularArticlesPerBrandView;
 import hu.okrim.productreviewappcomplete.model.views.MostPopularArticlesPerCategoryView;
+import hu.okrim.productreviewappcomplete.model.views.WeakAspectOfMostPopularProductsView;
 import hu.okrim.productreviewappcomplete.service.*;
 import hu.okrim.productreviewappcomplete.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,6 +49,8 @@ public class DashboardController {
     MostPopularArticlesPerBrandViewService mostPopularArticlesPerBrandViewService;
     @Autowired
     MostPopularArticlesPerCategoryViewService mostPopularArticlesPerCategoryViewService;
+    @Autowired
+    WeakAspectOfMostPopularProductsViewService weakAspectOfMostPopularProductsViewService;
     @Autowired
     JwtUtil tokenUtil;
 
@@ -112,5 +115,11 @@ public class DashboardController {
         User user = userService.findByUsername(tokenUtil.extractUserFromToken(request));
         Double percentage = reviewHeadService.findUserDomesticProductPercentage(user.getId());
         return new ResponseEntity<>(percentage, HttpStatus.OK);
+    }
+
+    @GetMapping("/weak-aspects-of-popular-products")
+    public ResponseEntity<List<WeakAspectOfMostPopularProductsView>> getWeakestAspects(){
+        List<WeakAspectOfMostPopularProductsView> returnList = weakAspectOfMostPopularProductsViewService.findAll();
+        return new ResponseEntity<>(returnList, HttpStatus.OK);
     }
 }

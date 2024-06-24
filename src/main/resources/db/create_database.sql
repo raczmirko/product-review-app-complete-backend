@@ -359,10 +359,14 @@ WITH get_most_popular_products_ratings_cte AS (
 		SELECT most_popular_product, aspect, average,
 			RANK() OVER (PARTITION BY aspect ORDER BY average ASC) as ranking
 		FROM get_most_popular_products_ratings_cte
-		WHERE average < 3
+		WHERE average < 4
 	)
-	SELECT most_popular_product AS product, aspect AS weakest_aspect
+	SELECT NEWID() AS id, p.id as product_id, a.id AS article_id, a.name AS article, pkg.id AS packaging_id, pkg.name AS packaging, asp.id AS aspect_id, asp.name AS weakest_aspect, CONCAT(CAST(ROUND(average, 2) AS DECIMAL(10, 2)), '/5') AS average
 	FROM most_popular_weakest_avg
+	INNER JOIN product p ON most_popular_product = p.id
+	INNER JOIN article a ON p.article = a.id
+	INNER JOIN packaging pkg ON p.packaging = pkg.id
+	INNER JOIN aspect asp ON most_popular_weakest_avg.aspect = asp.id
 	WHERE ranking = 1
 
 GO
