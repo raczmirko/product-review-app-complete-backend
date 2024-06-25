@@ -1,9 +1,6 @@
 package hu.okrim.productreviewappcomplete.repository;
 
-import hu.okrim.productreviewappcomplete.dto.DashboardMostActiveUserDTO;
-import hu.okrim.productreviewappcomplete.dto.DashboardReviewByMonthDTO;
-import hu.okrim.productreviewappcomplete.dto.DashboardUserBestRatedProductsDTO;
-import hu.okrim.productreviewappcomplete.dto.DashboardUserRatingsPerCategoryDTO;
+import hu.okrim.productreviewappcomplete.dto.*;
 import hu.okrim.productreviewappcomplete.model.Product;
 import hu.okrim.productreviewappcomplete.model.ReviewHead;
 import hu.okrim.productreviewappcomplete.model.User;
@@ -78,4 +75,94 @@ public interface ReviewHeadRepository extends JpaRepository<ReviewHead, ReviewHe
             "FROM domestic_review_count, review_total"
     )
     Double findUserDomesticProductPercentage(@Param("userId") Long userId);
+
+//    @Query( "WITH reviews_per_brand AS ( " +
+//                "SELECT a.brand.id AS brand, COUNT(1) as review_count " +
+//                "FROM ReviewHead rh" +
+//                "INNER JOIN Product p ON rh.product.id = p.id " +
+//                "INNER JOIN Article a ON p.article.id = a.id " +
+//                "GROUP BY a.brand.id " +
+//            "), " +
+//            "brands_ranked AS ( " +
+//                "SELECT brand, " +
+//                "RANK() OVER(ORDER BY review_count DESC) AS rank " +
+//                "FROM reviews_per_brand " +
+//            "), " +
+//            "top_brands AS ( " +
+//                "SELECT brand " +
+//                "FROM brands_ranked " +
+//                "WHERE rank = 1 " +
+//            "), " +
+//            "product_review_avg AS ( " +
+//                "SELECT rh.product.id, a.brand.id, AVG(rh.valueForPrice) AS avg_head,  " +
+//                "AVG(rb.score) AS avg_body,  " +
+//                "CAST(ROUND((AVG(rh.value_for_price) + COALESCE(AVG(rb.score), 5)) / 2.0, 2) AS DECIMAL(10, 2)) AS avg_total " +
+//                "FROM ReviewHead rh " +
+//                "LEFT JOIN review_body rb ON rh.user = rb.user AND rh.product = rb.product " +
+//                "INNER JOIN Product p ON rh.product.id = p.id " +
+//                "INNER JOIN Article a ON p.article.id = a.id " +
+//                "INNER JOIN top_brands tb ON a.brand.id = tb.brand  " +
+//                "WHERE rh.user.id = :userId  " +
+//                "AND a.brand.id IN (SELECT brand FROM top_brands) " +
+//                "GROUP BY rh.product.id, a.brand.id " +
+//            "), " +
+//            "interval_categories AS ( " +
+//                "SELECT  " +
+//                "CASE  " +
+//                "WHEN avg_total >= 1 AND avg_total < 2 THEN '1-2' " +
+//                "WHEN avg_total >= 2 AND avg_total < 3 THEN '2-3' " +
+//                "WHEN avg_total >= 3 AND avg_total < 4 THEN '3-4' " +
+//                "WHEN avg_total >= 4 AND avg_total <= 5 THEN '4-5' " +
+//                "END AS range " +
+//                "FROM product_review_avg " +
+//            ") " +
+//            "SELECT new hu.okrim.productreviewappcomplete.dto.DashboardFavBrandProdDistDTO(range, " +
+//            "CAST(ROUND(COUNT(1) * 100.0 / (SELECT COUNT(1) FROM product_review_avg), 2) AS DECIMAL(10,2)) AS percentage " +
+//            "FROM interval_categories " +
+//            "GROUP BY range")
+    @Query(value = "WITH reviews_per_brand AS ( " +
+                "SELECT a.brand AS brand, COUNT(1) as review_count " +
+                "FROM review_head rh " +
+                "INNER JOIN product p ON rh.product = p.id " +
+                "INNER JOIN article a ON p.article = a.id " +
+                "GROUP BY a.brand " +
+            "), " +
+            "brands_ranked AS ( " +
+                "SELECT brand, " +
+                "RANK() OVER(ORDER BY review_count DESC) AS rank " +
+                "FROM reviews_per_brand " +
+            "), " +
+            "top_brands AS ( " +
+                "SELECT brand " +
+                "FROM brands_ranked " +
+                "WHERE rank = 1 " +
+            "), " +
+            "product_review_avg AS ( " +
+                "SELECT rh.product, a.brand, AVG(rh.value_for_price) AS avg_head,  " +
+                "AVG(rb.score) AS avg_body,  " +
+                "CAST(ROUND((AVG(rh.value_for_price) + COALESCE(AVG(rb.score), 5)) / 2.0, 2) AS DECIMAL(10, 2)) AS avg_total " +
+                "FROM review_head rh " +
+                "LEFT JOIN review_body rb ON rh.[user] = rb.[user] AND rh.product = rb.product " +
+                "INNER JOIN product p ON rh.product = p.id " +
+                "INNER JOIN article a ON p.article = a.id " +
+                "INNER JOIN top_brands tb ON a.brand = tb.brand  " +
+                "WHERE rh.[user] = :userId " +
+                "AND a.brand IN (SELECT brand FROM top_brands) " +
+                "GROUP BY rh.product, a.brand " +
+            "), " +
+            "interval_categories AS ( " +
+                "SELECT  " +
+                "CASE  " +
+                "WHEN avg_total >= 1 AND avg_total < 2 THEN '1-2' " +
+                "WHEN avg_total >= 2 AND avg_total < 3 THEN '2-3' " +
+                "WHEN avg_total >= 3 AND avg_total < 4 THEN '3-4' " +
+                "WHEN avg_total >= 4 AND avg_total <= 5 THEN '4-5' " +
+                "END AS 'range' " +
+                "FROM product_review_avg " +
+            ") " +
+            "SELECT [range], " +
+            "CAST(ROUND(COUNT(1) * 100.0 / (SELECT COUNT(1) FROM product_review_avg), 2) AS DECIMAL(10,2)) AS percentage " +
+            "FROM interval_categories " +
+            "GROUP BY [range]", nativeQuery = true)
+    List<Object[]> findFavBrandProdDist(@Param("userId") Long userId);
 }

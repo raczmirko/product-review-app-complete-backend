@@ -1,5 +1,6 @@
 package hu.okrim.productreviewappcomplete.service;
 
+import hu.okrim.productreviewappcomplete.dto.DashboardFavBrandProdDistDTO;
 import hu.okrim.productreviewappcomplete.dto.DashboardReviewByMonthDTO;
 import hu.okrim.productreviewappcomplete.dto.DashboardUserBestRatedProductsDTO;
 import hu.okrim.productreviewappcomplete.dto.DashboardUserRatingsPerCategoryDTO;
@@ -15,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
@@ -73,5 +76,22 @@ public class ReviewHeadServiceImpl implements ReviewHeadService{
     @Override
     public Double findUserDomesticProductPercentage(Long id) {
         return reviewHeadRepository.findUserDomesticProductPercentage(id);
+    }
+
+    @Override
+    public List<DashboardFavBrandProdDistDTO> findFavBrandProdDist(Long userId) {
+        // Raw results are received as String-Double pairs
+        // Example: Object['1-2', 83.33]
+        List<Object[]> rawResults = reviewHeadRepository.findFavBrandProdDist(userId);
+        List<DashboardFavBrandProdDistDTO> result = new ArrayList<>();
+
+        for (Object[] rawResult : rawResults) {
+            String range = (String) rawResult[0];
+            BigDecimal percentageBigDecimal = (BigDecimal) rawResult[1];
+            Double percentage = percentageBigDecimal.doubleValue();
+            result.add(new DashboardFavBrandProdDistDTO(range, percentage));
+        }
+
+        return result;
     }
 }

@@ -1,9 +1,6 @@
 package hu.okrim.productreviewappcomplete.controller;
 
-import hu.okrim.productreviewappcomplete.dto.DashboardMostActiveUserDTO;
-import hu.okrim.productreviewappcomplete.dto.DashboardReviewByMonthDTO;
-import hu.okrim.productreviewappcomplete.dto.DashboardUserBestRatedProductsDTO;
-import hu.okrim.productreviewappcomplete.dto.DashboardUserRatingsPerCategoryDTO;
+import hu.okrim.productreviewappcomplete.dto.*;
 import hu.okrim.productreviewappcomplete.model.User;
 import hu.okrim.productreviewappcomplete.model.views.MostPopularArticlesPerBrandView;
 import hu.okrim.productreviewappcomplete.model.views.MostPopularArticlesPerCategoryView;
@@ -18,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,5 +119,12 @@ public class DashboardController {
     public ResponseEntity<List<WeakAspectOfMostPopularProductsView>> getWeakestAspects(){
         List<WeakAspectOfMostPopularProductsView> returnList = weakAspectOfMostPopularProductsViewService.findAll();
         return new ResponseEntity<>(returnList, HttpStatus.OK);
+    }
+
+    @GetMapping("/favourite-brand-product-distribution")
+    public ResponseEntity<List<DashboardFavBrandProdDistDTO>> getFavBrandProdDist(HttpServletRequest request){
+        User user = userService.findByUsername(tokenUtil.extractUserFromToken(request));
+        List<DashboardFavBrandProdDistDTO> resultList = reviewHeadService.findFavBrandProdDist(user.getId());
+        return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
 }

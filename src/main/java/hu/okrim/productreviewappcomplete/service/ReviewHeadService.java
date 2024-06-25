@@ -1,5 +1,6 @@
 package hu.okrim.productreviewappcomplete.service;
 
+import hu.okrim.productreviewappcomplete.dto.DashboardFavBrandProdDistDTO;
 import hu.okrim.productreviewappcomplete.dto.DashboardReviewByMonthDTO;
 import hu.okrim.productreviewappcomplete.dto.DashboardUserBestRatedProductsDTO;
 import hu.okrim.productreviewappcomplete.dto.DashboardUserRatingsPerCategoryDTO;
@@ -25,4 +26,5 @@ public interface ReviewHeadService {
     List<DashboardUserRatingsPerCategoryDTO> findUserRatingsPerCategory(Long userId);
     List<DashboardUserBestRatedProductsDTO> findUserBestRatedProducts(Long userId);
     Double findUserDomesticProductPercentage(Long id);
+    List<DashboardFavBrandProdDistDTO> findFavBrandProdDist(Long userId);
 }
